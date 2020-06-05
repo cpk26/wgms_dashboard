@@ -1,0 +1,31 @@
+html {
+    box-sizing: border-box;
+  }
+  
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+
+.main_container {
+    padding: 8%;
+}
+.mini_container {
+    border-radius: 5px;
+    /* background-color: #f9f9f9; */
+    background-color:  #e6f7ff;
+    margin: 10px 0px 10px 0px;
+    padding: 15px;
+    position: relative;
+    box-shadow: 2px 2px 2px lightgrey;
+}
+
+.selection_panel {
+    height: calc(100% - 20px);
+
+}
+.satellite_container {
+    padding-left: 8%;
+    padding-right: 8%;
+    
+}
+

@@ -28,7 +28,6 @@ app = dash.Dash(
     ]
 )
 
-
 app.layout = dbc.Container(
     [
         dbc.Row(
@@ -47,49 +46,72 @@ app.layout = dbc.Container(
         dbc.Row(
             [
                 dbc.Col(
-                    html.Div("One of three columns", style={"backgroundColor": "blue"}),
-                    md=4,
-                ),
-                dbc.Col(
                     [
-                        html.Div(
-                            [html.H3("XXk"), "Glaciers"], className="mini_container"
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        html.Div(
+                                            [html.H3("XXk"), "Glaciers"],
+                                            className="mini_container",
+                                        ),
+                                    ],
+                                    width=3,
+                                ),
+                                dbc.Col(
+                                    html.Div(
+                                        [html.H3("19XX"), "Oldest Record"],
+                                        className="mini_container",
+                                    ),
+                                    width=3,
+                                ),
+                                dbc.Col(
+                                    html.Div(
+                                        [html.H3("XXX+"), "Contributors"],
+                                        className="mini_container",
+                                    ),
+                                    width=3,
+                                ),
+                                dbc.Col(
+                                    html.Div(
+                                        [html.H3("XX"), "Countries"],
+                                        className="mini_container",
+                                    ),
+                                    width=3,
+                                ),
+                            ],
+                        ),
+                        dbc.Row(
+                            dbc.Col(
+                                html.Div(
+                                    [
+                                        html.H5(
+                                            "Satellite Overview",
+                                            className="text-center",
+                                        ),
+                                        dcc.Graph(figure=fig),
+                                    ],
+                                    className="mini_container satellite_container",
+                                ),
+                                width=12,
+                            ),
                         ),
                     ],
-                    md=2,
+                    md=8,
                 ),
                 dbc.Col(
-                    html.Div(
-                        [html.H3("19XX"), "Oldest Record"], className="mini_container"
-                    ),
-                    md=2,
-                ),
-                dbc.Col(
-                    html.Div(
-                        [html.H3("XXX+"), "Contributors"], className="mini_container"
-                    ),
-                    md=2,
-                ),
-                dbc.Col(
-                    html.Div([html.H3("XX"), "Countries"], className="mini_container"),
-                    md=2,
+                    html.Div("RIGHT PANEL", className="mini_container selection_panel"),
+                    md=4,
                 ),
             ]
         ),
         dbc.Row(
             [
                 dbc.Col(
-                    html.Div("One of four columns", className="mini_container"), md=4
+                    html.Div("BOTTOM LEFT PANEL", className="mini_container "), md=6,
                 ),
                 dbc.Col(
-                    html.Div(
-                        [
-                            html.H5("Satellite Overview", className="text-center"),
-                            dcc.Graph(figure=fig),
-                        ],
-                        className="mini_container satellite_container",
-                    ),
-                    md=8,
+                    html.Div("BOTTOM RIGHT PANEL", className="mini_container "), md=6,
                 ),
             ]
         ),
@@ -97,5 +119,74 @@ app.layout = dbc.Container(
     fluid=True,
     className="main_container",
 )
+
+# app.layout = dbc.Container(
+#     [
+#         dbc.Row(
+#             [
+#                 dbc.Col(
+#                     [
+#                         html.H1(
+#                             "World Glacier Monitoring Service", className="text-center"
+#                         ),
+#                         html.H5("Data Explorer", className="text-center"),
+#                     ],
+#                     md=12,
+#                 )
+#             ]
+#         ),
+#         dbc.Row(
+#             [
+#                 dbc.Col(
+#                     html.Div("One of three columns", style={"backgroundColor": "blue"}),
+#                     md=4,
+#                 ),
+#                 dbc.Col(
+#                     [
+#                         html.Div(
+#                             [html.H3("XXk"), "Glaciers"], className="mini_container"
+#                         ),
+#                     ],
+#                     md=2,
+#                 ),
+#                 dbc.Col(
+#                     html.Div(
+#                         [html.H3("19XX"), "Oldest Record"], className="mini_container"
+#                     ),
+#                     md=2,
+#                 ),
+#                 dbc.Col(
+#                     html.Div(
+#                         [html.H3("XXX+"), "Contributors"], className="mini_container"
+#                     ),
+#                     md=2,
+#                 ),
+#                 dbc.Col(
+#                     html.Div([html.H3("XX"), "Countries"], className="mini_container"),
+#                     md=2,
+#                 ),
+#             ]
+#         ),
+#         dbc.Row(
+#             [
+#                 dbc.Col(
+#                     html.Div("One of four columns", className="mini_container"), md=4
+#                 ),
+#                 dbc.Col(
+#                     html.Div(
+#                         [
+#                             html.H5("Satellite Overview", className="text-center"),
+#                             dcc.Graph(figure=fig),
+#                         ],
+#                         className="mini_container satellite_container",
+#                     ),
+#                     md=8,
+#                 ),
+#             ]
+#         ),
+#     ],
+#     fluid=True,
+#     className="main_container",
+# )
 
 app.run_server(debug=True, use_reloader=True)  # Turn off reloader if inside Jupyter
