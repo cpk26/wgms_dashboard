@@ -1,26 +1,53 @@
 import plotly.graph_objects as go
 import pandas as pd
-
-fig = go.Figure()
-
-df_combined = pd.read_pickle("wgms_combined")
-
-fig = go.Figure(
-    data=go.Scattermapbox(
-        lon=df_combined["long"],
-        lat=df_combined["lat"],
-        mode="markers",
-        marker=go.scattermapbox.Marker(size=8),
-    )
-)
-fig.update_layout(mapbox_style="stamen-terrain", mapbox_center_lon=45)
-fig.update_layout(autosize=True, height=300, margin=dict(l=0, r=0, b=0, t=0, pad=50))
-
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Input, Output
 
+# Data Import
+df_combined = pd.read_pickle("wgms_combined")
+df_thickness = pd.read_pickle("wgms_thickness")
+
+# Satellite Map
+def update_satellite_map():
+    fig = go.Figure(
+        data=go.Scattermapbox(
+            lon=df_combined["LONGITUDE"],
+            lat=df_combined["LATITUDE"],
+            customdata=df_combined["WGMS_ID"],
+            mode="markers",
+            marker=go.scattermapbox.Marker(size=8),
+        )
+    )
+    fig.update_layout(
+        mapbox_style="stamen-terrain",
+        mapbox_center_lat=0,
+        mapbox_center_lon=0,
+        mapbox_zoom=0,
+    )
+    fig.update_layout(
+        autosize=True, height=300, margin=dict(l=0, r=0, b=0, t=0, pad=50)
+    )
+
+    return fig
+
+
+def update_thickness_change():
+    tid = 4630
+    d2020 = pd.DataFrame({"YEAR": [2020], "THICKNESS_CHG": [0]})
+
+    df_t = (
+        df_thickness[df_thickness["WGMS_ID"] == tid]
+        .drop("WGMS_ID", axis=1)
+        .append(d2020)
+    )
+    fig = go.Figure([go.Bar(x=df_t.YEAR, y=df_t.THICKNESS_CHG, width=1)])
+    return fig
+
+
+# Dash App
 app = dash.Dash(
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
@@ -89,7 +116,9 @@ app.layout = dbc.Container(
                                             "Satellite Overview",
                                             className="text-center",
                                         ),
-                                        dcc.Graph(figure=fig),
+                                        dcc.Graph(
+                                            figure=update_satellite_map(), id="mapbox"
+                                        ),
                                     ],
                                     className="mini_container satellite_container",
                                 ),
@@ -100,7 +129,9 @@ app.layout = dbc.Container(
                     md=8,
                 ),
                 dbc.Col(
-                    html.Div("RIGHT PANEL", className="mini_container selection_panel"),
+                    html.Div(
+                        "RIGHT PANEL", className="mini_container selection_panel",
+                    ),
                     md=4,
                 ),
             ]
@@ -108,10 +139,24 @@ app.layout = dbc.Container(
         dbc.Row(
             [
                 dbc.Col(
-                    html.Div("BOTTOM LEFT PANEL", className="mini_container "), md=6,
+                    html.Div(
+                        "BOTTOM LEFT PANEL",
+                        id="glacier_info",
+                        className="mini_container ",
+                    ),
+                    md=6,
                 ),
                 dbc.Col(
-                    html.Div("BOTTOM RIGHT PANEL", className="mini_container "), md=6,
+                    html.Div(
+                        [
+                            html.H5("Thickness Change", className="text-center",),
+                            dcc.Graph(
+                                figure=update_thickness_change(), id="thickness_chg"
+                            ),
+                        ],
+                        className="mini_container ",
+                    ),
+                    md=6,
                 ),
             ]
         ),
@@ -120,73 +165,18 @@ app.layout = dbc.Container(
     className="main_container",
 )
 
-# app.layout = dbc.Container(
-#     [
-#         dbc.Row(
-#             [
-#                 dbc.Col(
-#                     [
-#                         html.H1(
-#                             "World Glacier Monitoring Service", className="text-center"
-#                         ),
-#                         html.H5("Data Explorer", className="text-center"),
-#                     ],
-#                     md=12,
-#                 )
-#             ]
-#         ),
-#         dbc.Row(
-#             [
-#                 dbc.Col(
-#                     html.Div("One of three columns", style={"backgroundColor": "blue"}),
-#                     md=4,
-#                 ),
-#                 dbc.Col(
-#                     [
-#                         html.Div(
-#                             [html.H3("XXk"), "Glaciers"], className="mini_container"
-#                         ),
-#                     ],
-#                     md=2,
-#                 ),
-#                 dbc.Col(
-#                     html.Div(
-#                         [html.H3("19XX"), "Oldest Record"], className="mini_container"
-#                     ),
-#                     md=2,
-#                 ),
-#                 dbc.Col(
-#                     html.Div(
-#                         [html.H3("XXX+"), "Contributors"], className="mini_container"
-#                     ),
-#                     md=2,
-#                 ),
-#                 dbc.Col(
-#                     html.Div([html.H3("XX"), "Countries"], className="mini_container"),
-#                     md=2,
-#                 ),
-#             ]
-#         ),
-#         dbc.Row(
-#             [
-#                 dbc.Col(
-#                     html.Div("One of four columns", className="mini_container"), md=4
-#                 ),
-#                 dbc.Col(
-#                     html.Div(
-#                         [
-#                             html.H5("Satellite Overview", className="text-center"),
-#                             dcc.Graph(figure=fig),
-#                         ],
-#                         className="mini_container satellite_container",
-#                     ),
-#                     md=8,
-#                 ),
-#             ]
-#         ),
-#     ],
-#     fluid=True,
-#     className="main_container",
-# )
+
+@app.callback(
+    Output(component_id="glacier_info", component_property="children"),
+    [Input(component_id="mapbox", component_property="clickData")],
+)
+def update_glacier_info_div(input_value):
+    wgms_id = "N/A"
+    if input_value:
+        point_data = input_value["points"][0]
+        wgms_id = point_data["customdata"]
+
+    return f"{wgms_id}"
+
 
 app.run_server(debug=True, use_reloader=True)  # Turn off reloader if inside Jupyter
