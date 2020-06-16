@@ -12,26 +12,26 @@ df_thickness = pd.read_pickle("wgms_thickness")
 
 # Satellite Map
 def update_satellite_map():
-    fig = go.Figure(
-        data=go.Scattermapbox(
-            lon=df_combined["LONGITUDE"],
-            lat=df_combined["LATITUDE"],
-            customdata=df_combined["WGMS_ID"],
-            mode="markers",
-            marker=go.scattermapbox.Marker(size=8),
-        )
+
+    data = go.Scattermapbox(
+        lon=df_combined["LONGITUDE"],
+        lat=df_combined["LATITUDE"],
+        customdata=df_combined["WGMS_ID"],
+        mode="markers",
+        marker=go.scattermapbox.Marker(size=8),
     )
-    fig.update_layout(
+    layout = dict(
         mapbox_style="stamen-terrain",
         mapbox_center_lat=0,
         mapbox_center_lon=0,
         mapbox_zoom=0,
-    )
-    fig.update_layout(
-        autosize=True, height=300, margin=dict(l=0, r=0, b=0, t=0, pad=50)
+        autosize=True,
+        height=300,
+        margin=dict(l=0, r=0, b=0, t=0, pad=50),
     )
 
-    return fig
+    figure = go.Figure(data=data, layout=layout)
+    return figure
 
 
 def update_thickness_change():
@@ -43,8 +43,18 @@ def update_thickness_change():
         .drop("WGMS_ID", axis=1)
         .append(d2020)
     )
-    fig = go.Figure([go.Bar(x=df_t.YEAR, y=df_t.THICKNESS_CHG, width=1)])
-    return fig
+
+    data = go.Bar(x=df_t.YEAR, y=df_t.THICKNESS_CHG, width=1)
+    layout = dict(
+        xaxis_title="Year",
+        yaxis_title="\delta (mm)",
+        autosize=True,
+        height=300,
+        margin=dict(l=20, r=20, b=20, t=50, pad=0),
+    )
+
+    figure = go.Figure(data=data, layout=layout)
+    return figure
 
 
 # Dash App

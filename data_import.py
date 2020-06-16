@@ -18,31 +18,67 @@ import pandas as pd
 import numpy as np
 import os
 import pyproj
+from pyproj import Transformer
+
 
 
 # %%
 data_dir = './DOI-WGMS-FoG-2019-12/'
 a_glacier_file = 'WGMS-FoG-2019-12-A-GLACIER.csv'
+change_glacier_file = 'WGMS-FoG-2019-12-D-CHANGE.csv'
 
 # %%
-df_combined = pd.DataFrame()
+df_compiled = pd.DataFrame()
 
 # %% [markdown]
-# ### Read WGMS_A file to extract lat-long; drop rows with null values in lat-long
+# ### Extract relevant Glacial Characteristics from the WGMS_A file
 
 # %%
 df_A = pd.read_csv(os.path.join(data_dir,a_glacier_file))
 df_A.dropna(axis='rows',subset=['LONGITUDE','LATITUDE'], inplace=True)
 
 # %%
-wgms_projection = pyproj.Proj(init='epsg:4326')  # wgs84
-web_projection = pyproj.Proj(init='epsg:3857')  # default google projection
+df_A.columns
 
-df_combined['long'], df_combined['lat'] = df_A['LONGITUDE'], df_A['LATITUDE']
-df_combined['merX'],df_combined['merY'] = pyproj.transform(wgms_projection, web_projection, df_combined['long'].values, df_combined['lat'].values)
+# %%
+A_columns = ['WGMS_ID','LONGITUDE','LATITUDE','SPEC_LOCATION','NAME']
+df_compiled = df_A.loc[:,A_columns]
 
 
 # %%
-df_combined.to_pickle('wgms_combined')
+transformer = Transformer.from_crs("epsg:4326", "epsg:3857")
+df_compiled.loc[:, 'merX'],df_compiled.loc[:, 'merY'] =transformer.transform(df_compiled['LONGITUDE'].values, df_compiled['LATITUDE'].values)
+
+# %% [markdown]
+# ### Thickness Change
+
+# %%
+df_D = pd.read_csv(os.path.join(data_dir,change_glacier_file))
+df_D.dropna(axis='rows',subset=['THICKNESS_CHG'], inplace=True)
+
+# %%
+df_D['YEAR']
+
+# %%
+D_columns = ['WGMS_ID','YEAR','THICKNESS_CHG']
+df_thickness_chg = df_D.loc[:,D_columns].groupby(['WGMS_ID','YEAR'], as_index=False).median()
+
+# %%
+df_thickness_chg['WGMS_ID'].nunique()
+
+# %% [markdown]
+# ### Save File and Print out Leading lines
+
+# %%
+df_compiled.to_pickle('wgms_combined')
+
+# %%
+df_compiled.head(n=2)
+
+# %%
+df_thickness_chg.to_pickle('wgms_thickness')
+
+# %%
+df_thickness_chg.head(n=2)
 
 # %%
