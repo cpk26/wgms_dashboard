@@ -9,6 +9,11 @@ from dash.dependencies import Input, Output
 # Data Import
 df_combined = pd.read_pickle("wgms_combined")
 df_thickness = pd.read_pickle("wgms_thickness")
+df_massbalance = pd.read_pickle("wgms_massbalance")
+df_front = pd.read_pickle("wgms_front")
+
+# Default selection is Mer De Glace
+mer_de_glace = 353
 
 # Satellite Map
 def update_satellite_map():
@@ -34,36 +39,16 @@ def update_satellite_map():
     return figure
 
 
-def update_thickness_change():
-    tid = 4630
-    d2020 = pd.DataFrame({"YEAR": [2020], "THICKNESS_CHG": [0]})
-
-    df_t = (
-        df_thickness[df_thickness["WGMS_ID"] == tid]
-        .drop("WGMS_ID", axis=1)
-        .append(d2020)
-    )
-
-    data = go.Bar(x=df_t.YEAR, y=df_t.THICKNESS_CHG, width=1)
-    layout = dict(
-        xaxis_title="Year",
-        yaxis_title="\delta (mm)",
-        autosize=True,
-        height=300,
-        margin=dict(l=20, r=20, b=20, t=50, pad=0),
-    )
-
-    figure = go.Figure(data=data, layout=layout)
-    return figure
-
-
 # Dash App
+
 app = dash.Dash(
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
         "https://codepen.io/chriddyp/pen/bWLwgP.css",
     ]
 )
+mathjax = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"
+app.scripts.append_script({"external_url": mathjax})
 
 app.layout = dbc.Container(
     [
@@ -150,23 +135,33 @@ app.layout = dbc.Container(
             [
                 dbc.Col(
                     html.Div(
-                        "BOTTOM LEFT PANEL",
-                        id="glacier_info",
+                        [
+                            html.H5("Mass Balance", className="text-center",),
+                            dcc.Graph(id="mass_balance"),
+                        ],
                         className="mini_container ",
                     ),
-                    md=6,
+                    md=4,
                 ),
                 dbc.Col(
                     html.Div(
                         [
                             html.H5("Thickness Change", className="text-center",),
-                            dcc.Graph(
-                                figure=update_thickness_change(), id="thickness_chg"
-                            ),
+                            dcc.Graph(id="thickness_change"),
                         ],
                         className="mini_container ",
                     ),
-                    md=6,
+                    md=4,
+                ),
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.H5("Front Variation", className="text-center",),
+                            dcc.Graph(id="front_variation"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    md=4,
                 ),
             ]
         ),
@@ -187,6 +182,60 @@ def update_glacier_info_div(input_value):
         wgms_id = point_data["customdata"]
 
     return f"{wgms_id}"
+
+
+@app.callback(
+    [
+        Output(component_id="thickness_change", component_property="figure"),
+        Output(component_id="mass_balance", component_property="figure"),
+        Output(component_id="front_variation", component_property="figure"),
+    ],
+    [Input(component_id="mapbox", component_property="clickData")],
+)
+def update_glacier_figures(satellite_clickdata):
+
+    if satellite_clickdata is None:
+        satellite_clickdata = {"points": [{"customdata": mer_de_glace}]}
+
+    selected = satellite_clickdata["points"][0]["customdata"]
+
+    df_t = df_thickness.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
+    df_mb = df_massbalance.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
+    df_fv = df_front.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
+
+    thickness_fig = dict(
+        data=[dict(type="bar", x=df_t.YEAR, y=df_t.THICKNESS_CHG, width=1)],
+        layout=dict(
+            xaxis_title="Year",
+            yaxis_title="(mm)",
+            autosize=True,
+            height=200,
+            margin=dict(l=20, r=20, b=20, t=20, pad=0),
+        ),
+    )
+
+    massbalance_fig = dict(
+        data=[dict(type="bar", x=df_mb.YEAR, y=df_mb.ANNUAL_BALANCE, width=1)],
+        layout=dict(
+            xaxis_title="Year",
+            yaxis_title="(mm w.e.)",
+            autosize=True,
+            height=200,
+            margin=dict(l=20, r=20, b=20, t=20, pad=0),
+        ),
+    )
+    frontvar_fig = dict(
+        data=[dict(type="bar", x=df_fv.YEAR, y=df_fv.FRONT_VARIATION, width=1)],
+        layout=dict(
+            xaxis_title="Year",
+            yaxis_title="(mm w.e.)",
+            autosize=True,
+            height=200,
+            margin=dict(l=20, r=20, b=20, t=20, pad=0),
+        ),
+    )
+
+    return thickness_fig, massbalance_fig, frontvar_fig
 
 
 app.run_server(debug=True, use_reloader=True)  # Turn off reloader if inside Jupyter
