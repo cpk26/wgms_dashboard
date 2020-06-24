@@ -12,7 +12,7 @@ df_thickness = pd.read_pickle("wgms_thickness")
 df_massbalance = pd.read_pickle("wgms_massbalance")
 df_front = pd.read_pickle("wgms_front")
 
-# Default selection is Mer De Glace
+# Default selection is Mer De Glace, WGMS_ID = 353
 mer_de_glace = 353
 
 # Satellite Map
@@ -47,9 +47,8 @@ app = dash.Dash(
         "https://codepen.io/chriddyp/pen/bWLwgP.css",
     ]
 )
-mathjax = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"
-app.scripts.append_script({"external_url": mathjax})
 
+# Layout
 app.layout = dbc.Container(
     [
         dbc.Row(
@@ -125,7 +124,187 @@ app.layout = dbc.Container(
                 ),
                 dbc.Col(
                     html.Div(
-                        "RIGHT PANEL", className="mini_container selection_panel",
+                        [
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.P("Filter by earliest measurement:"),
+                                            dcc.Slider(
+                                                id="my-slider",
+                                                min=1850,
+                                                max=2020,
+                                                step=1,
+                                                value=2020,
+                                                marks={
+                                                    1850: "1850",
+                                                    1900: "1900",
+                                                    1950: "1950",
+                                                    2000: "2000",
+                                                },
+                                            ),
+                                        ],
+                                        className="selection_item",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.P("Filter by years of data:"),
+                                            dcc.Slider(
+                                                id="my-slider2",
+                                                min=0,
+                                                max=10,
+                                                step=1,
+                                                value=2020,
+                                                marks={
+                                                    0: "0",
+                                                    2: "2",
+                                                    4: "4",
+                                                    6: "6",
+                                                    8: "8",
+                                                    10: "10+",
+                                                },
+                                            ),
+                                        ],
+                                        className="selection_item",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.P("Filter by Primary Classification:"),
+                                            dcc.Dropdown(
+                                                options=[
+                                                    {
+                                                        "label": "Miscellaneous",
+                                                        "value": "0",
+                                                    },
+                                                    {
+                                                        "label": "Continental ice sheet",
+                                                        "value": "1",
+                                                    },
+                                                    {
+                                                        "label": "Ice Field",
+                                                        "value": "2",
+                                                    },
+                                                    {"label": "Ice Cap", "value": "3"},
+                                                    {
+                                                        "label": "Outlet Glacier",
+                                                        "value": "4",
+                                                    },
+                                                    {
+                                                        "label": "Valley Glacier",
+                                                        "value": "5",
+                                                    },
+                                                    {
+                                                        "label": "Mountain glacier ",
+                                                        "value": "6",
+                                                    },
+                                                    {
+                                                        "label": "Glacieret and snowfield",
+                                                        "value": "7",
+                                                    },
+                                                    {
+                                                        "label": "Ice Shelf",
+                                                        "value": "8",
+                                                    },
+                                                    {
+                                                        "label": "Rock Glacier",
+                                                        "value": "9",
+                                                    },
+                                                ],
+                                                multi=True,
+                                                value="None",
+                                            ),
+                                        ],
+                                        className="selection_item",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.P("Filter by Form:"),
+                                            dcc.Dropdown(
+                                                options=[
+                                                    {
+                                                        "label": "Miscellaneous",
+                                                        "value": "0",
+                                                    },
+                                                    {
+                                                        "label": "Compound Basins",
+                                                        "value": "1",
+                                                    },
+                                                    {
+                                                        "label": "Compound Basin",
+                                                        "value": "2",
+                                                    },
+                                                    {
+                                                        "label": "Simple Basin",
+                                                        "value": "3",
+                                                    },
+                                                    {"label": "Circque", "value": "4"},
+                                                    {"label": "Niche", "value": "5"},
+                                                    {"label": "Crater", "value": "6",},
+                                                    {
+                                                        "label": "Ice Apron",
+                                                        "value": "7",
+                                                    },
+                                                    {"label": "Group", "value": "8"},
+                                                    {"label": "Remnant", "value": "9"},
+                                                ],
+                                                multi=True,
+                                                value="None",
+                                            ),
+                                        ],
+                                        className="selection_item",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.P(
+                                                "Filter by Frontal Characteristics:"
+                                            ),
+                                            dcc.Dropdown(
+                                                options=[
+                                                    {
+                                                        "label": "Miscellaneous",
+                                                        "value": "0",
+                                                    },
+                                                    {
+                                                        "label": "Piedmont",
+                                                        "value": "1",
+                                                    },
+                                                    {
+                                                        "label": "Expanded Foot",
+                                                        "value": "2",
+                                                    },
+                                                    {"label": "Lobed", "value": "3"},
+                                                    {"label": "Calving", "value": "4"},
+                                                    {
+                                                        "label": "Coalescing, non-contributing",
+                                                        "value": "5",
+                                                    },
+                                                    {
+                                                        "label": "Irregular, clean ice",
+                                                        "value": "6",
+                                                    },
+                                                    {
+                                                        "label": "Irregular, debris-covered",
+                                                        "value": "7",
+                                                    },
+                                                    {
+                                                        "label": "Single lobe, clean ice",
+                                                        "value": "8",
+                                                    },
+                                                    {
+                                                        "label": "Single lobe, debris-covered",
+                                                        "value": "9",
+                                                    },
+                                                ],
+                                                multi=True,
+                                                value="None",
+                                            ),
+                                        ],
+                                        className="selection_item",
+                                    ),
+                                ],
+                            )
+                        ],
+                        className="mini_container selection_panel",
                     ),
                     md=4,
                 ),
@@ -170,6 +349,15 @@ app.layout = dbc.Container(
     className="main_container",
 )
 
+def ts_extend_helper(df):
+    '''Extend timeseries of length one with a zero measurement in 2020 for plotting purposes'''
+    df_out = df
+    
+    if df.shape[0] == 1:
+        zero_frame = pd.DataFrame([[2020, 0]], columns=df.columns)
+        df_out = df.append(zero_frame)
+        
+    return df_out
 
 @app.callback(
     Output(component_id="glacier_info", component_property="children"),
@@ -202,6 +390,10 @@ def update_glacier_figures(satellite_clickdata):
     df_t = df_thickness.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
     df_mb = df_massbalance.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
     df_fv = df_front.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
+    
+    df_t = ts_extend_helper(df_t)
+    df_mb = ts_extend_helper(df_mb)
+    df_fv = ts_extend_helper(df_fv)
 
     thickness_fig = dict(
         data=[dict(type="bar", x=df_t.YEAR, y=df_t.THICKNESS_CHG, width=1)],
