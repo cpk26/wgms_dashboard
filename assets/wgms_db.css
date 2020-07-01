@@ -32,3 +32,12 @@ html {
     
 }
 
+.glacier_info_panel {
+    height: calc(100% - 20px);
+
+}
+
+.glacier_info_item {
+    width: 100%;
+}
+
