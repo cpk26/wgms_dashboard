@@ -431,7 +431,7 @@ no_data_fig = dict(
     )
 )
 
-
+# Extend time series -- not used
 def ts_extend_helper(df):
     """Extend timeseries of length one with a zero measurement in 2020 for plotting purposes"""
 
@@ -727,4 +727,5 @@ def update_glacier_figures(satellite_clickdata):
     return thickness_fig, massbalance_fig, length_fig, area_fig
 
 
-app.run_server(debug=True, use_reloader=True)  # Turn off reloader if inside Jupyter
+if __name__ == "__main__":
+    app.run_server(debug=True)
