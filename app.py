@@ -27,6 +27,8 @@ app = dash.Dash(
     ]
 )
 
+server = app.server
+
 # Layout
 app.layout = dbc.Container(
     [
