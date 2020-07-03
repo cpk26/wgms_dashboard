@@ -11,7 +11,9 @@ from dash.dependencies import Input, Output
 df_combined = pd.read_pickle("wgms_combined")
 df_thickness = pd.read_pickle("wgms_thickness")
 df_massbalance = pd.read_pickle("wgms_massbalance")
-df_front = pd.read_pickle("wgms_front")
+df_length = pd.read_pickle("wgms_length")
+df_area = pd.read_pickle("wgms_area")
+
 
 # Default selection is Mer De Glace, WGMS_ID = 353
 mer_de_glace = 353
@@ -32,13 +34,46 @@ app.layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        html.H1(
-                            "World Glacier Monitoring Service", className="text-center"
+                        html.Div(
+                            "World Glacier Monitoring Service",
+                            className="header text-center",
                         ),
-                        html.H5("Data Explorer", className="text-center"),
+                        html.Div(
+                            "Fluctuations of Glaciers Data Explorer",
+                            className="sub-header text-center",
+                        ),
                     ],
                     md=12,
                 )
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    "Dashboard by ",
+                                    html.A(
+                                        "Inlet Labs",
+                                        href="https://inletlabs.com/",
+                                        className="info_link",
+                                    ),
+                                    ". Based on WGMS ",
+                                    html.A(
+                                        "2019 Data",
+                                        href="https://wgms.ch/data_databaseversions/",
+                                        className="info_link",
+                                    ),
+                                    ".",
+                                ],
+                                className="bottom_info_container text-right",
+                            ),
+                        ],
+                    ),
+                    md=12,
+                ),
             ]
         ),
         dbc.Row(
@@ -212,7 +247,7 @@ app.layout = dbc.Container(
                                                         "label": "Simple Basin",
                                                         "value": 3,
                                                     },
-                                                    {"label": "Circque", "value": 4},
+                                                    {"label": "Cirque", "value": 4},
                                                     {"label": "Niche", "value": 5},
                                                     {"label": "Crater", "value": 6},
                                                     {"label": "Ice Apron", "value": 7,},
@@ -331,14 +366,18 @@ app.layout = dbc.Container(
                     [
                         html.Div(
                             [
-                                html.H5("Mass Balance", className="text-center",),
+                                html.H5(
+                                    "Mass Balance [mm w.e]", className="text-center",
+                                ),
                                 dcc.Graph(id="mass_balance"),
                             ],
                             className="mini_container ",
                         ),
                         html.Div(
                             [
-                                html.H5("Thickness Change", className="text-center",),
+                                html.H5(
+                                    "Thickness Change [mm]", className="text-center",
+                                ),
                                 dcc.Graph(id="thickness_change"),
                             ],
                             className="mini_container ",
@@ -350,26 +389,19 @@ app.layout = dbc.Container(
                     [
                         html.Div(
                             [
-                                html.H5("Front Variation", className="text-center",),
-                                dcc.Graph(id="front_variation"),
+                                html.H5("Length [km]", className="text-center",),
+                                dcc.Graph(id="length_ts"),
+                            ],
+                            className="mini_container ",
+                        ),
+                        html.Div(
+                            [
+                                html.H5(["Area [1000 m²]"], className="text-center",),
+                                dcc.Graph(id="area_ts"),
                             ],
                             className="mini_container ",
                         ),
                     ],
-                    md=4,
-                ),
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    html.Div(
-                        [
-                            html.H5("Error messages", className="text-center",),
-                            html.Div(id="error-div"),
-                        ],
-                        className="mini_container ",
-                    ),
                     md=4,
                 ),
             ]
@@ -380,14 +412,34 @@ app.layout = dbc.Container(
 )
 
 
+no_data_fig = dict(
+    layout=dict(
+        xaxis={"visible": False},
+        yaxis={"visible": False},
+        autosize=True,
+        height=200,
+        margin=dict(l=40, r=20, b=20, t=20, pad=1),
+        annotations=[
+            dict(
+                text="No Available Data",
+                xref="paper",
+                yref="paper",
+                showarrow=False,
+                font={"size": 14},
+            )
+        ],
+    )
+)
+
+
 def ts_extend_helper(df):
     """Extend timeseries of length one with a zero measurement in 2020 for plotting purposes"""
 
     df_out = df
 
     if df.shape[0] == 1:
-        zero_frame = pd.DataFrame([[2020, 0]], columns=df.columns)
-        df_out = df.append(zero_frame)
+        df_out.loc[len(df_out), :] = 0
+        df_out.loc[len(df_out), "YEAR"] = 2020
 
     return df_out
 
@@ -408,8 +460,8 @@ def glacier_filter_helper(
 
     # Apply Filters
     dff = (
-        df.query("FIRST_MEAS < @first_meas")
-        .query("YEAR_MEASUREMENTS > @years_data")
+        df.query("FIRST_MEAS <= @first_meas")
+        .query("YEAR_MEASUREMENTS >= @years_data")
         .query("PRIM_CLASSIFIC in @prim_classific")
         .query("FORM in @form")
         .query("FRONTAL_CHARS in @frontal_chars")
@@ -419,9 +471,9 @@ def glacier_filter_helper(
 
 
 def num_data_points_helper(unique_ids):
-    """Determine total number of datapoints in thickness, mass balance, and front variation datasets for a set of wgms id's"""
+    """Determine total number of datapoints in thickness, mass balance, and length variation datasets for a set of wgms id's"""
 
-    dfs = [df_thickness, df_massbalance, df_front]
+    dfs = [df_thickness, df_massbalance, df_length, df_area]
     num_data_points = sum(
         [df[df["WGMS_ID"].isin(unique_ids)].iloc[:, 0].count() for df in dfs]
     )
@@ -435,7 +487,6 @@ def num_data_points_helper(unique_ids):
 @app.callback(
     [
         Output(component_id="mapbox", component_property="figure"),
-        Output(component_id="error-div", component_property="children"),
         Output(component_id="num_glaciers", component_property="children"),
         Output(component_id="earliest_record", component_property="children"),
         Output(component_id="num_countries", component_property="children"),
@@ -468,9 +519,11 @@ def update_satellite_map(first_meas, years_data, prim_classific, form, frontal_c
             type="scattermapbox",
             lon=df["LONGITUDE"],
             lat=df["LATITUDE"],
-            customdata=df["WGMS_ID"],
+            customdata=df.loc[:, ["NAME", "WGMS_ID"]].values,
+            tname=df["NAME"].values,
             mode="markers",
-            marker=go.scattermapbox.Marker(size=8, opacity=0.3),
+            marker=go.scattermapbox.Marker(size=8, opacity=0.7),
+            hovertemplate="<b>%{customdata[0]}</b><br>Lat: %{lat:.2f} <br>Lon: %{lon:.2f}<extra></extra>",
         )
     ]
 
@@ -489,7 +542,6 @@ def update_satellite_map(first_meas, years_data, prim_classific, form, frontal_c
 
     return (
         satellite_map,
-        str(unique_ids),
         num_glaciers,
         earliest_record,
         num_countries,
@@ -516,9 +568,11 @@ def update_glacier_info_div(input_value):
     wgms_id = mer_de_glace
     outputs = []
 
+    app.logger.info("TESTING")
+
     if input_value:
         point_data = input_value["points"][0]
-        wgms_id = point_data["customdata"]
+        wgms_id = point_data["customdata"][1]
 
     df = df_combined[df_combined["WGMS_ID"] == wgms_id].reset_index()
     text_keys = dict(
@@ -554,7 +608,7 @@ def update_glacier_info_div(input_value):
             if len(value) > 100:
                 value = value[0:100] + "..."
 
-        outputs.append([text, html.Br(), value])
+        outputs.append([html.B(text), html.Br(), value])
 
     return outputs
 
@@ -563,7 +617,8 @@ def update_glacier_info_div(input_value):
     [
         Output(component_id="thickness_change", component_property="figure"),
         Output(component_id="mass_balance", component_property="figure"),
-        Output(component_id="front_variation", component_property="figure"),
+        Output(component_id="length_ts", component_property="figure"),
+        Output(component_id="area_ts", component_property="figure"),
     ],
     [Input(component_id="mapbox", component_property="clickData")],
 )
@@ -571,51 +626,105 @@ def update_glacier_figures(satellite_clickdata):
     """ Update time series figures of mass balance, length, area, and thickness change """
 
     if satellite_clickdata is None:
-        satellite_clickdata = {"points": [{"customdata": mer_de_glace}]}
+        satellite_clickdata = {
+            "points": [{"customdata": ["Mer de Glace", mer_de_glace]}]
+        }
 
-    selected = satellite_clickdata["points"][0]["customdata"]
+    selected = satellite_clickdata["points"][0]["customdata"][1]
 
     df_t = df_thickness.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
     df_mb = df_massbalance.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
-    df_fv = df_front.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
+    df_l = df_length.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
+    df_a = df_area.query("WGMS_ID == @selected").drop("WGMS_ID", axis=1)
 
-    df_t = ts_extend_helper(df_t)
-    df_mb = ts_extend_helper(df_mb)
-    df_fv = ts_extend_helper(df_fv)
+    # df_t = ts_extend_helper(df_t)
+    # df_mb = ts_extend_helper(df_mb)
+    # df_l = ts_extend_helper(df_l)
+    # df_a = ts_extend_helper(df_a)
 
-    thickness_fig = dict(
-        data=[dict(type="bar", x=df_t.YEAR, y=df_t.THICKNESS_CHG, width=1)],
-        layout=dict(
-            xaxis_title="Year",
-            yaxis_title="(mm)",
-            autosize=True,
-            height=200,
-            margin=dict(l=20, r=20, b=20, t=20, pad=0),
-        ),
-    )
+    thickness_fig = massbalance_fig = length_fig = area_fig = no_data_fig
 
-    massbalance_fig = dict(
-        data=[dict(type="bar", x=df_mb.YEAR, y=df_mb.ANNUAL_BALANCE, width=1)],
-        layout=dict(
-            xaxis_title="Year",
-            yaxis_title="(mm w.e.)",
-            autosize=True,
-            height=200,
-            margin=dict(l=20, r=20, b=20, t=20, pad=0),
-        ),
-    )
-    frontvar_fig = dict(
-        data=[dict(type="bar", x=df_fv.YEAR, y=df_fv.FRONT_VARIATION, width=1)],
-        layout=dict(
-            xaxis_title="Year",
-            yaxis_title="(mm w.e.)",
-            autosize=True,
-            height=200,
-            margin=dict(l=20, r=20, b=20, t=20, pad=0),
-        ),
-    )
+    if not df_t.empty:
+        traces = []
 
-    return thickness_fig, massbalance_fig, frontvar_fig
+        for _, row in df_t.iterrows():
+            x = [row["REFERENCE_DATE"], row["YEAR"]]
+            y = [row["THICKNESS_CHG"], row["THICKNESS_CHG"]]
+            trace = dict(type="scatter", x=x, y=y, width=1, showlegend=False)
+            traces.append(trace)
+
+        thickness_fig = dict(
+            data=traces,
+            layout=dict(
+                autosize=True,
+                height=200,
+                margin=dict(l=45, r=20, b=20, t=20, pad=1),
+                yaxis=dict(tickformat=".0f"),
+            ),
+        )
+
+    if not df_mb.empty:
+        massbalance_fig = dict(
+            data=[
+                dict(
+                    type="bar",
+                    x=df_mb.YEAR,
+                    y=df_mb.ANNUAL_BALANCE,
+                    width=1,
+                    marker=dict(opacity=0.3,),
+                )
+            ],
+            layout=dict(
+                autosize=True,
+                height=200,
+                xaxis=dict(tickformat=".0f"),
+                margin=dict(l=40, r=20, b=20, t=20, pad=1),
+            ),
+        )
+
+    if not df_l.empty:
+        length_fig = dict(
+            data=[
+                dict(
+                    type="bar",
+                    orientation="h",
+                    y=df_l.YEAR,
+                    x=df_l.LENGTH,
+                    width=1,
+                    marker=dict(size=12, opacity=0.3,),
+                )
+            ],
+            layout=dict(
+                mode="lines+markers",
+                autosize=True,
+                height=200,
+                margin=dict(l=50, r=20, b=20, t=20, pad=1),
+                yaxis=dict(tickformat=".0f"),
+            ),
+        )
+
+    if not df_a.empty:
+        area_fig = dict(
+            data=[
+                dict(
+                    type="scatter",
+                    x=df_a.YEAR,
+                    y=df_a.AREA,
+                    width=1,
+                    fill="tonexty",
+                    marker=dict(color="rgb(158,202,225)", opacity=1,),
+                    line=dict(color="rgb(158,202,225)"),
+                )
+            ],
+            layout=dict(
+                autosize=True,
+                height=200,
+                margin=dict(l=40, r=20, b=20, t=20, pad=1),
+                xaxis=dict(tickformat=".0f"),
+            ),
+        )
+
+    return thickness_fig, massbalance_fig, length_fig, area_fig
 
 
 app.run_server(debug=True, use_reloader=True)  # Turn off reloader if inside Jupyter

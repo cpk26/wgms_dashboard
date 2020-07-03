@@ -32,7 +32,7 @@ b_glacier_file = "WGMS-FoG-2019-12-B-STATE.csv"
 d_change_file = "WGMS-FoG-2019-12-D-CHANGE.csv"
 e_massbalance_file = "WGMS-FoG-2019-12-E-MASS-BALANCE-OVERVIEW.csv"
 ee_massbalance_file = "WGMS-FoG-2019-12-EE-MASS-BALANCE.csv"
-c_front_file = "WGMS-FoG-2019-12-C-FRONT-VARIATION.csv"
+
 
 # %%
 # Main dataframe containing overall information
@@ -47,6 +47,21 @@ df_A.dropna(axis="rows", subset=["LONGITUDE", "LATITUDE"], inplace=True)
 
 # %%
 df_A.columns
+
+# %%
+# Prettify Capitalization
+df_A['NAME'] = df_A['NAME'].apply(lambda x: string.capwords(x))
+
+notna = df_A['SPEC_LOCATION'].notna()
+df_A.loc[notna,'SPEC_LOCATION'] = df_A.loc[notna,'SPEC_LOCATION'].apply(lambda x: string.capwords(str(x)))
+
+# Change to Float for Consistency
+df_A['PRIM_CLASSIFIC'] = df_A['PRIM_CLASSIFIC'].astype(float)
+df_A['FORM'] = df_A['FORM'].replace(' ', np.nan).astype(float)
+df_A['FRONTAL_CHARS'] = df_A['FRONTAL_CHARS'].astype(float)
+
+
+
 
 # %%
 # Extract relevant columns
@@ -66,26 +81,15 @@ A_columns = [
     "REMARKS",
 ]
 
-df_A['NAME'] = df_A['NAME'].apply(lambda x: string.capwords(x))
-
-notna = df_A['SPEC_LOCATION'].notna()
-df_A.loc[notna,'SPEC_LOCATION'] = df_A.loc[notna,'SPEC_LOCATION'].apply(lambda x: string.capwords(str(x)))
-
 df_compiled = df_A.loc[:, A_columns]
 
-
-# %%
-# Mercator X and Y coordinates
-transformer = Transformer.from_crs("epsg:4326", "epsg:3857")
-df_compiled.loc[:, "merX"], df_compiled.loc[:, "merY"] = transformer.transform(
-    df_compiled["LONGITUDE"].values, df_compiled["LATITUDE"].values
-)
 
 # %% [markdown]
 # ### Extract additional data from WGMS_B File
 
 # %%
 df_B = pd.read_csv(os.path.join(data_dir, b_glacier_file))
+df_B = df_B.query("YEAR > 0")
 df_B.columns
 
 # %%
@@ -117,7 +121,6 @@ df_B_reduced.drop_duplicates("WGMS_ID", keep="last", inplace=True)
 def ts_helper(df, columns):
     """Extract time series data so that: 
         1: There is one measurement per year; multiple measurements are summarized crudely with median()
-        2: Add a measurement in 2020, with value zero, for plotting purposes
         """
 
     # One measurement per Year
@@ -128,33 +131,45 @@ def ts_helper(df, columns):
 
 
 # %% [markdown]
-# ### Thickness and Area Change
+# ### Thickness Change
 
 # %%
 df_D = pd.read_csv(os.path.join(data_dir, d_change_file))
-df_th = df_D.copy()
-df_ar = df_D.copy()
-
-# %%
 df_D.columns
 
 # %%
-df_th.dropna(axis="rows", subset=["THICKNESS_CHG"], inplace=True)
-th_columns = ["WGMS_ID", "YEAR", "THICKNESS_CHG"]
-df_thickness_chg = ts_helper(df_th, th_columns)
+th_columns = ["WGMS_ID", "YEAR", "THICKNESS_CHG",'REFERENCE_DATE']
+df_D_ = df_D.loc[:,th_columns]
+df_D_.dropna(axis=0, how="any", inplace=True)
+
+# %%
+df_D_['REFERENCE_DATE'] = df_D_['REFERENCE_DATE'].apply(lambda x: int(str(x)[0:4]))
+
+# %%
+df_thickness_chg = ts_helper(df_D_, th_columns)
 
 # %% [markdown]
-# ### Area Change
+# ### Area
 
 # %%
-df_ar.dropna(axis="rows", subset=["AREA_CHANGE"], inplace=True)
+area_columns = ["WGMS_ID", "YEAR", "AREA"]
+df_area = ts_helper(df_B, area_columns)
+df_area.dropna(axis="rows", inplace=True)
 
 # %%
-ar_columns = ["WGMS_ID", "YEAR", "AREA_CHANGE"]
-df_area_chg = ts_helper(df_ar, ar_columns)
+df_area.head(n=5)
+
+# %% [markdown]
+# ### Length
 
 # %%
-df_area_chg
+length_columns = ["WGMS_ID", "YEAR", "LENGTH"]
+df_length = ts_helper(df_B, length_columns)
+df_length.dropna(axis="rows", inplace=True)
+
+
+# %%
+df_length.head(n=5)
 
 # %% [markdown]
 # ### Mass Balance
@@ -165,17 +180,6 @@ df_EE.dropna(axis="rows", subset=["ANNUAL_BALANCE"], inplace=True)
 
 EE_columns = ["WGMS_ID", "YEAR", "ANNUAL_BALANCE"]
 df_mass_balance = ts_helper(df_EE, EE_columns)
-
-# %% [markdown]
-# ### Length
-
-# %%
-df_C = pd.read_csv(os.path.join(data_dir, c_front_file))
-df_C.columns = df_C.columns.str.upper()
-df_C.dropna(axis="rows", subset=["FRONT_VARIATION"], inplace=True)
-
-C_columns = ["WGMS_ID", "YEAR", "FRONT_VARIATION"]
-df_front = ts_helper(df_C, C_columns)
 
 # %% [markdown]
 # ### Extract site Time Series Characteristics
@@ -189,7 +193,7 @@ df_wgms = df_compiled.loc[:, ["WGMS_ID"]]
 # %%
 dfs = [
     df.loc[:, ["WGMS_ID", "YEAR"]].set_index("WGMS_ID")
-    for df in [df_thickness_chg, df_mass_balance, df_front]
+    for df in [df_thickness_chg, df_mass_balance, df_length, df_area]
 ]
 dfs_ = [df.groupby("WGMS_ID")["YEAR"].min() for df in dfs]
 df_first_measurement = pd.concat(dfs_, axis=1, join="outer").min(axis=1).reset_index()
@@ -201,7 +205,7 @@ df_first_measurement.rename({0: "FIRST_MEAS"}, axis=1, inplace=True)
 # %%
 dfs = [
     df.loc[:, ["WGMS_ID", "YEAR"]]
-    for df in [df_thickness_chg, df_mass_balance, df_front]
+    for df in [df_thickness_chg, df_mass_balance, df_length, df_area]
 ]
 dfs_ = pd.concat(dfs).drop_duplicates(keep="first")
 df_year_measurement = dfs_.groupby("WGMS_ID").size().reset_index()
@@ -244,7 +248,8 @@ df_compiled.head(n=10)
 df_compiled.to_pickle("wgms_combined")
 df_thickness_chg.to_pickle("wgms_thickness")
 df_mass_balance.to_pickle("wgms_massbalance")
-df_front.to_pickle("wgms_front")
+df_length.to_pickle("wgms_length")
+df_area.to_pickle("wgms_area")
 
 # %% [markdown]
 # ### WGMS ID of MER DE GLACE
@@ -252,11 +257,15 @@ df_front.to_pickle("wgms_front")
 # %%
 df_compiled[df_compiled["NAME"].str.contains("glace", case=False)]
 
-# %%
-df_compiled.query("WGMS_ID == 353")
 
 # %%
-df_compiled['HIGHEST_ELEVATION'][0] is np.nan
+df_compiled['YEAR_MEASUREMENTS'].unique()
+
 
 # %%
+list(range(11))
 
+# %%
+1.0 in list(range(11))
+
+# %%

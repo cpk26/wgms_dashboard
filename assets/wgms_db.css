@@ -7,7 +7,10 @@ html {
   }
 
 .main_container {
-    padding: 8%;
+    padding-top: 3%;
+    padding-bottom: 5%;
+    padding-left: 8%;
+    padding-right: 8%;
 }
 .mini_container {
     border-radius: 5px;
@@ -41,3 +44,18 @@ html {
     width: 100%;
 }
 
+.bottom_info_container {
+    padding-top: 20px;
+}
+
+.info_link {
+    text-decoration: none; 
+}
+
+.header {
+    font-size: 2.5em;
+}
+
+.sub-header {
+    font-size: 1.5em;
+}
