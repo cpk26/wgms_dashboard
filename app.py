@@ -21,10 +21,11 @@ mer_de_glace = 353
 # Dash App
 
 app = dash.Dash(
+    __name__,
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
         "https://codepen.io/chriddyp/pen/bWLwgP.css",
-    ]
+    ],
 )
 
 server = app.server
