@@ -1,112 +1,24 @@
-appdirs==1.4.3
-astroid @ file:///home/conda/feedstock_root/build_artifacts/astroid_1588698301699/work
-attrs==19.3.0
-backcall==0.1.0
-black==19.10b0
-bleach @ file:///home/conda/feedstock_root/build_artifacts/bleach_1588608214987/work
-bokeh==2.0.1
-brotlipy==0.7.0
-certifi==2020.4.5.1
-cffi==1.14.0
-chardet==3.0.4
+Brotli==1.0.7
+certifi==2020.6.20
 click==7.1.2
-cryptography==2.9.2
-cycler==0.10.0
-dash @ file:///home/conda/feedstock_root/build_artifacts/dash_1588897734495/work
-dash-bootstrap-components @ file:///home/conda/feedstock_root/build_artifacts/dash-bootstrap-components_1590827098850/work
-dash-core-components @ file:///home/conda/feedstock_root/build_artifacts/dash-core-components_1588718481532/work
+dash==1.13.4
+dash-bootstrap-components==0.10.3
+dash-core-components==1.10.1
 dash-html-components==1.0.3
-dash-renderer @ file:///home/conda/feedstock_root/build_artifacts/dash-renderer_1588706167484/work
-dash-table @ file:///home/conda/feedstock_root/build_artifacts/dash-table_1588867552135/work
-decorator==4.4.2
-defusedxml==0.6.0
-entrypoints==0.3
+dash-renderer==1.5.1
+dash-table==4.8.1
 Flask==1.1.2
 Flask-Compress==1.5.0
 future==0.18.2
-idna==2.9
-importlib-metadata==1.6.0
-ipykernel @ file:///home/conda/feedstock_root/build_artifacts/ipykernel_1590020202605/work/dist/ipykernel-5.3.0-py3-none-any.whl
-ipython @ file:///home/conda/feedstock_root/build_artifacts/ipython_1590796906184/work
-ipython-genutils==0.2.0
-ipywidgets==7.5.1
-isort==4.3.21
+gunicorn==20.0.4
 itsdangerous==1.1.0
-jedi==0.17.0
 Jinja2==2.11.2
-joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1589812474002/work
-json5==0.9.0
-jsonschema==3.2.0
-jupyter-client==6.1.3
-jupyter-console==6.1.0
-jupyter-core==4.6.3
-jupyterlab==2.1.4
-jupyterlab-server @ file:///home/conda/feedstock_root/build_artifacts/jupyterlab_server_1590229434073/work
-jupytext==1.4.2
-kiwisolver==1.2.0
-lazy-object-proxy==1.4.3
 MarkupSafe==1.1.1
-matplotlib==3.2.1
-mccabe==0.6.1
-mistune==0.8.4
-mypy-extensions==0.4.3
-nbconvert==5.6.1
-nbformat==5.0.6
-notebook @ file:///home/conda/feedstock_root/build_artifacts/notebook_1588887220875/work
-numpy @ file:///home/conda/feedstock_root/build_artifacts/numpy_1588605082776/work
-olefile==0.46
-packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1589925210001/work
-pandas @ file:///home/conda/feedstock_root/build_artifacts/pandas_1590752755944/work
-pandocfilters==1.4.2
-parso==0.7.0
-pathspec==0.8.0
-patsy==0.5.1
-pexpect==4.8.0
-pickleshare==0.7.5
-Pillow==7.1.2
-plotly @ file:///home/conda/feedstock_root/build_artifacts/plotly_1590724681830/work
-prometheus-client @ file:///home/conda/feedstock_root/build_artifacts/prometheus_client_1590412252446/work
-prompt-toolkit==3.0.5
-ptyprocess==0.6.0
-pycparser==2.20
-Pygments==2.6.1
-pylint @ file:///home/conda/feedstock_root/build_artifacts/pylint_1588950500625/work
-pyOpenSSL==19.1.0
-pyparsing==2.4.7
-pyproj @ file:///home/conda/feedstock_root/build_artifacts/pyproj_1588596072923/work
-PyQt5==5.12.3
-PyQt5-sip==4.19.18
-PyQtChart==5.12
-PyQtWebEngine==5.12.1
-pyrsistent==0.16.0
-PySocks==1.7.1
+numpy==1.19.0
+pandas==1.0.5
+plotly==4.8.2
 python-dateutil==2.8.1
 pytz==2020.1
-PyYAML==5.3.1
-pyzmq==19.0.1
-qtconsole @ file:///home/conda/feedstock_root/build_artifacts/qtconsole_1589392299544/work
-QtPy==1.9.0
-regex @ file:///home/conda/feedstock_root/build_artifacts/regex_1589465125099/work
-requests==2.23.0
 retrying==1.3.3
-scikit-learn @ file:///home/conda/feedstock_root/build_artifacts/scikit-learn_1589920858304/work
-scipy==1.4.1
-seaborn==0.10.1
-Send2Trash==1.5.0
-six @ file:///home/conda/feedstock_root/build_artifacts/six_1590081179328/work
-statsmodels==0.11.1
-terminado==0.8.3
-testpath==0.4.4
-threadpoolctl @ file:///tmp/tmp79xdzxkt/threadpoolctl-2.1.0-py3-none-any.whl
-toml @ file:///home/conda/feedstock_root/build_artifacts/toml_1589469402899/work
-tornado==6.0.4
-traitlets==4.3.3
-typed-ast==1.4.1
-typing-extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1588470653596/work
-urllib3==1.25.9
-wcwidth==0.1.9
-webencodings==0.5.1
+six==1.15.0
 Werkzeug==1.0.1
-widgetsnbextension==3.5.1
-wrapt==1.11.2
-zipp==3.1.0
