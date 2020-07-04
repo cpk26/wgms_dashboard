@@ -20,12 +20,29 @@ import os
 import pyproj
 from pyproj import Transformer
 import string
+import os
+import requests, zipfile, io
 
 
 # %%
-# Data Directory
-data_dir = "./DOI-WGMS-FoG-2019-12/"
+# Data Directory / Files
+data_dir = "./DOI-WGMS-FoG-2019-12"
+data_archive_url = "https://wgms.ch/downloads/DOI-WGMS-FoG-2019-12.zip"
+target_path = './DOI-WGMS-FoG-2019-12.zip'
 
+# Download if not present,      
+if not os.path.exists(data_dir):
+    response = requests.get(data_archive_url, stream=True)
+    with open(target_path, "wb") as target_file:
+        for chunk in response.iter_content(chunk_size=512):
+            if chunk:  
+                target_file.write(chunk)
+    z = zipfile.ZipFile(target_path)
+    z.extractall()
+    
+
+
+# %%
 # WGMS Data Files
 a_glacier_file = "WGMS-FoG-2019-12-A-GLACIER.csv"
 b_glacier_file = "WGMS-FoG-2019-12-B-STATE.csv"
@@ -40,6 +57,9 @@ df_compiled = pd.DataFrame()
 
 # %% [markdown]
 # ### Extract relevant Glacial Characteristics from the WGMS_A file
+
+# %% [markdown]
+# #### At this point, open the `a_glacier_file` and resave in utf-8 format (LibreOffice Calc works).
 
 # %%
 df_A = pd.read_csv(os.path.join(data_dir, a_glacier_file))
@@ -59,6 +79,8 @@ df_A.loc[notna,'SPEC_LOCATION'] = df_A.loc[notna,'SPEC_LOCATION'].apply(lambda x
 df_A['PRIM_CLASSIFIC'] = df_A['PRIM_CLASSIFIC'].astype(float)
 df_A['FORM'] = df_A['FORM'].replace(' ', np.nan).astype(float)
 df_A['FRONTAL_CHARS'] = df_A['FRONTAL_CHARS'].astype(float)
+
+
 
 
 

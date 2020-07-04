@@ -71,7 +71,7 @@ app.layout = dbc.Container(
                                     ),
                                     ".",
                                 ],
-                                className="bottom_info_container text-right",
+                                className="bottom_info_container text-center offset-md-8",
                             ),
                         ],
                     ),
@@ -570,8 +570,6 @@ def update_glacier_info_div(input_value):
     """Update Detailed Information Panel based on satellite map clickdata"""
     wgms_id = mer_de_glace
     outputs = []
-
-    app.logger.info("TESTING")
 
     if input_value:
         point_data = input_value["points"][0]
