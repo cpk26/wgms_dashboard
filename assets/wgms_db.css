@@ -6,12 +6,29 @@ html {
     box-sizing: inherit;
   }
 
-.main_container {
+
+  .main_container {
     padding-top: 3%;
     padding-bottom: 5%;
     padding-left: 8%;
     padding-right: 8%;
 }
+
+  @media (min-width: 2000px) { 
+      .main_container {
+        padding-top: 3%;
+        padding-bottom: 5%;
+        padding-left: 15%;
+        padding-right: 15%;
+} }
+
+@media (min-width: 3800px) { 
+    .main_container {
+      padding-top: 3%;
+      padding-bottom: 5%;
+      width: 3800px;
+} }
+
 .mini_container {
     border-radius: 5px;
     background-color:  #f6f6f6;

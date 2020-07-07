@@ -605,7 +605,6 @@ def num_data_points_helper(unique_ids):
     num_data_points = sum(
         [df[df["WGMS_ID"].isin(unique_ids)].iloc[:, 0].count() for df in dfs]
     )
-    print(unique_ids)
     return num_data_points
 
 
