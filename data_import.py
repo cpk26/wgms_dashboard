@@ -242,7 +242,7 @@ df_year_measurement.rename({0: "YEAR_MEASUREMENTS"}, axis=1, inplace=True)
 df_thickness_ts_bool = pd.DataFrame({'WGMS_ID': df_thickness_chg['WGMS_ID'].unique(), 'THICKNESS_CHANGE_TS': True})
 df_length_ts_bool = pd.DataFrame({'WGMS_ID': df_length['WGMS_ID'].unique(), 'LENGTH_TS': True})
 df_area_ts_bool = pd.DataFrame({'WGMS_ID': df_area['WGMS_ID'].unique(), 'AREA_TS': True})
-df_mb_ts_bool = pd.DataFrame({'WGMS_ID': df_mass_balance['WGMS_ID'].unique(), 'MASS_BALANCE_TS': True})
+df_mb_ts_bool = pd.DataFrame({'WGMS_ID': df_mass_balance['WGMS_ID'].unique(), 't': True})
 
 
 # %%

@@ -63,6 +63,10 @@ html {
     width: 100%;
 }
 
+.half_width {
+    width: 50%;
+}
+
 .checkbox_table {
     /* border: none !important;
     border-collapse:collapse !important;

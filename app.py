@@ -355,6 +355,7 @@ app.layout = dbc.Container(
                                                                     labelStyle=cb_labelStyle,
                                                                     style=cb_style,
                                                                 ),
+                                                                className="half_width",
                                                             ),
                                                             html.Td(
                                                                 dcc.Checklist(
@@ -368,7 +369,8 @@ app.layout = dbc.Container(
                                                                     inputStyle=cb_inputStyle,
                                                                     labelStyle=cb_labelStyle,
                                                                     style=cb_style,
-                                                                )
+                                                                ),
+                                                                className="half_width",
                                                             ),
                                                         ],
                                                     ),
@@ -386,7 +388,8 @@ app.layout = dbc.Container(
                                                                     inputStyle=cb_inputStyle,
                                                                     labelStyle=cb_labelStyle,
                                                                     style=cb_style,
-                                                                )
+                                                                ),
+                                                                className="half_width",
                                                             ),
                                                             html.Td(
                                                                 dcc.Checklist(
@@ -400,7 +403,8 @@ app.layout = dbc.Container(
                                                                     inputStyle=cb_inputStyle,
                                                                     labelStyle=cb_labelStyle,
                                                                     style=cb_style,
-                                                                )
+                                                                ),
+                                                                className="half_width",
                                                             ),
                                                         ],
                                                         className="checkbox_table",
@@ -492,7 +496,9 @@ app.layout = dbc.Container(
                     [
                         html.Div(
                             [
-                                html.H5("Length [km]", className="text-center",),
+                                html.H5(
+                                    "Glacier Length [km]", className="text-center",
+                                ),
                                 dcc.Graph(id="length_ts"),
                             ],
                             className="mini_container ",
