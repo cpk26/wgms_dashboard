@@ -42,6 +42,7 @@ if not os.path.exists(data_dir):
     
 
 
+
 # %%
 # WGMS Data Files
 a_glacier_file = "WGMS-FoG-2019-12-A-GLACIER.csv"
@@ -51,15 +52,15 @@ e_massbalance_file = "WGMS-FoG-2019-12-E-MASS-BALANCE-OVERVIEW.csv"
 ee_massbalance_file = "WGMS-FoG-2019-12-EE-MASS-BALANCE.csv"
 
 
+# %% [markdown]
+# #### At this point, open the `a_glacier_file`,  `ee_glacier_file` files and resave in utf-8 format (LibreOffice Calc works).
+
 # %%
 # Main dataframe containing overall information
 df_compiled = pd.DataFrame()
 
 # %% [markdown]
 # ### Extract relevant Glacial Characteristics from the WGMS_A file
-
-# %% [markdown]
-# #### At this point, open the `a_glacier_file` and resave in utf-8 format (LibreOffice Calc works).
 
 # %%
 df_A = pd.read_csv(os.path.join(data_dir, a_glacier_file))
@@ -79,6 +80,7 @@ df_A.loc[notna,'SPEC_LOCATION'] = df_A.loc[notna,'SPEC_LOCATION'].apply(lambda x
 df_A['PRIM_CLASSIFIC'] = df_A['PRIM_CLASSIFIC'].astype(float)
 df_A['FORM'] = df_A['FORM'].replace(' ', np.nan).astype(float)
 df_A['FRONTAL_CHARS'] = df_A['FRONTAL_CHARS'].astype(float)
+
 
 
 
@@ -234,6 +236,19 @@ df_year_measurement = dfs_.groupby("WGMS_ID").size().reset_index()
 df_year_measurement.rename({0: "YEAR_MEASUREMENTS"}, axis=1, inplace=True)
 
 # %% [markdown]
+# ### Which time series data each glacier has
+
+# %%
+df_thickness_ts_bool = pd.DataFrame({'WGMS_ID': df_thickness_chg['WGMS_ID'].unique(), 'THICKNESS_CHANGE_TS': True})
+df_length_ts_bool = pd.DataFrame({'WGMS_ID': df_length['WGMS_ID'].unique(), 'LENGTH_TS': True})
+df_area_ts_bool = pd.DataFrame({'WGMS_ID': df_area['WGMS_ID'].unique(), 'AREA_TS': True})
+df_mb_ts_bool = pd.DataFrame({'WGMS_ID': df_mass_balance['WGMS_ID'].unique(), 'MASS_BALANCE_TS': True})
+
+
+# %%
+df_mb_ts_bool.head(n=5)
+
+# %% [markdown]
 # ### Concatenate
 
 # %%
@@ -241,6 +256,13 @@ df_compiled = df_compiled.merge(df_B_reduced, how="left", on="WGMS_ID", validate
 df_compiled = df_compiled.merge(df_first_measurement, on="WGMS_ID", how="left")
 df_compiled = df_compiled.merge(df_year_measurement, on="WGMS_ID", how="left")
 
+df_compiled = df_compiled.merge(df_thickness_ts_bool, on="WGMS_ID", how="left")
+df_compiled = df_compiled.merge(df_length_ts_bool, on="WGMS_ID", how="left")
+df_compiled = df_compiled.merge(df_area_ts_bool, on="WGMS_ID", how="left")
+df_compiled = df_compiled.merge(df_mb_ts_bool, on="WGMS_ID", how="left")
+
+
+#Set Sensible Null Values
 # Set first measurement to 2020 if value is Nan, measured years to zero if value is NaN
 df_compiled.replace(
     {
@@ -255,13 +277,17 @@ df_compiled.replace(
         "SPONS_AGENCY": {np.nan: "N/A"},
         "REMARKS": {np.nan: "N/A"},
         "REFERENCE": {np.nan: "N/A"},
+        "THICKNESS_CHANGE_TS": {np.nan: False},
+        "LENGTH_TS": {np.nan: False},
+        "AREA_TS": {np.nan: False},
+        "MASS_BALANCE_TS": {np.nan: False},
 
     },
     inplace=True,
 )
 
 # %%
-df_compiled.head(n=10)
+df_compiled.head(n=4)
 
 # %% [markdown]
 # ### Save Files
@@ -281,13 +307,6 @@ df_compiled[df_compiled["NAME"].str.contains("glace", case=False)]
 
 
 # %%
-df_compiled['YEAR_MEASUREMENTS'].unique()
-
-
-# %%
-list(range(11))
-
-# %%
-1.0 in list(range(11))
+df_compiled.query("THICKNESS_CHANGE_TS in [True, False]").count()
 
 # %%

@@ -31,8 +31,7 @@ html {
 }
 .satellite_container {
     padding-left: 8%;
-    padding-right: 8%;
-    
+    padding-right: 8%;    
 }
 
 .glacier_info_panel {
@@ -59,3 +58,14 @@ html {
 .sub-header {
     font-size: 1.5em;
 }
+
+.ts_table {
+    width: 100%;
+}
+
+.checkbox_table {
+    /* border: none !important;
+    border-collapse:collapse !important;
+    border-style : hidden!important; */
+}
+

@@ -1,3 +1,4 @@
+from dash_html_components.Tr import Tr
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
@@ -20,13 +21,7 @@ mer_de_glace = 353
 
 # Dash App
 
-app = dash.Dash(
-    __name__,
-    external_stylesheets=[
-        dbc.themes.BOOTSTRAP,
-        "https://codepen.io/chriddyp/pen/bWLwgP.css",
-    ],
-)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,],)
 
 server = app.server
 
@@ -83,59 +78,77 @@ app.layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        dbc.Row(
+                        dbc.Col(
                             [
-                                dbc.Col(
+                                # presumptive entry
+                                dbc.Row(
                                     [
-                                        html.Div(
-                                            [html.H3(id="num_glaciers"), "Glaciers"],
-                                            className="mini_container",
+                                        dbc.Col(
+                                            [
+                                                html.Div(
+                                                    [
+                                                        html.H3(id="num_glaciers"),
+                                                        "Glaciers",
+                                                    ],
+                                                    className="mini_container",
+                                                ),
+                                            ],
+                                            width=3,
+                                        ),
+                                        dbc.Col(
+                                            html.Div(
+                                                [
+                                                    html.H3(id="num_data_points"),
+                                                    "Data Points",
+                                                ],
+                                                className="mini_container",
+                                            ),
+                                            width=3,
+                                        ),
+                                        dbc.Col(
+                                            html.Div(
+                                                [
+                                                    html.H3(id="earliest_record"),
+                                                    "Oldest Record",
+                                                ],
+                                                className="mini_container",
+                                            ),
+                                            width=3,
+                                        ),
+                                        dbc.Col(
+                                            html.Div(
+                                                [
+                                                    html.H3(id="num_countries"),
+                                                    "Countries",
+                                                ],
+                                                className="mini_container",
+                                            ),
+                                            width=3,
                                         ),
                                     ],
-                                    width=3,
                                 ),
-                                dbc.Col(
-                                    html.Div(
-                                        [html.H3(id="num_data_points"), "Data Points"],
-                                        className="mini_container",
+                                dbc.Row(
+                                    dbc.Col(
+                                        html.Div(
+                                            [
+                                                html.H5(
+                                                    "Satellite Overview",
+                                                    className="text-center",
+                                                ),
+                                                dcc.Graph(id="mapbox"),
+                                            ],
+                                            className="satellite_container",
+                                        ),
+                                        width=12,
                                     ),
-                                    width=3,
-                                ),
-                                dbc.Col(
-                                    html.Div(
-                                        [
-                                            html.H3(id="earliest_record"),
-                                            "Oldest Record",
-                                        ],
-                                        className="mini_container",
-                                    ),
-                                    width=3,
-                                ),
-                                dbc.Col(
-                                    html.Div(
-                                        [html.H3(id="num_countries"), "Countries"],
-                                        className="mini_container",
-                                    ),
-                                    width=3,
+                                    className="flex-grow-1 mini_container",
                                 ),
                             ],
+                            className="h-100 d-flex flex-column",
                         ),
-                        dbc.Row(
-                            dbc.Col(
-                                html.Div(
-                                    [
-                                        html.H5(
-                                            "Satellite Overview",
-                                            className="text-center",
-                                        ),
-                                        dcc.Graph(id="mapbox"),
-                                    ],
-                                    className="mini_container satellite_container",
-                                ),
-                                width=12,
-                            ),
-                        ),
+                        # presumptive exit
                     ],
+                    className="container-fluid ",
                     md=8,
                 ),
                 dbc.Col(
@@ -145,7 +158,7 @@ app.layout = dbc.Container(
                                 [
                                     html.Div(
                                         [
-                                            html.P("Filter by earliest measurement:"),
+                                            html.P("Filter by Earliest Measurement:"),
                                             dcc.Slider(
                                                 id="first_measurement_slider",
                                                 min=1850,
@@ -164,7 +177,7 @@ app.layout = dbc.Container(
                                     ),
                                     html.Div(
                                         [
-                                            html.P("Filter by years of data:"),
+                                            html.P("Filter by Years of Data:"),
                                             dcc.Slider(
                                                 id="years_data_slider",
                                                 min=0,
@@ -311,6 +324,70 @@ app.layout = dbc.Container(
                                         ],
                                         className="selection_item",
                                     ),
+                                    html.Div(
+                                        [
+                                            html.P("Filter by Available Data:"),
+                                            html.Table(
+                                                [
+                                                    html.Tr(
+                                                        [
+                                                            html.Td(
+                                                                dcc.Checklist(
+                                                                    id="checkbox_mb",
+                                                                    options=[
+                                                                        {
+                                                                            "label": " Mass Balance",
+                                                                            "value": 1,
+                                                                        },
+                                                                    ],
+                                                                )
+                                                            ),
+                                                            html.Td(
+                                                                dcc.Checklist(
+                                                                    id="checkbox_length",
+                                                                    options=[
+                                                                        {
+                                                                            "label": " Length",
+                                                                            "value": 1,
+                                                                        },
+                                                                    ],
+                                                                )
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    html.Tr(
+                                                        [
+                                                            html.Td(
+                                                                dcc.Checklist(
+                                                                    id="checkbox_tc",
+                                                                    options=[
+                                                                        {
+                                                                            "label": " Thickness Change",
+                                                                            "value": 1,
+                                                                        },
+                                                                    ],
+                                                                )
+                                                            ),
+                                                            html.Td(
+                                                                dcc.Checklist(
+                                                                    id="checkbox_area",
+                                                                    options=[
+                                                                        {
+                                                                            "label": " Area",
+                                                                            "value": 1,
+                                                                        },
+                                                                    ],
+                                                                )
+                                                            ),
+                                                        ],
+                                                        className="checkbox_table",
+                                                    ),
+                                                ],
+                                                className="ts_table checkbox_table",
+                                            ),
+                                        ],
+                                        className="selection_item",
+                                    ),
                                 ],
                             )
                         ],
@@ -434,6 +511,7 @@ no_data_fig = dict(
     )
 )
 
+
 # Extend time series -- not used
 def ts_extend_helper(df):
     """Extend timeseries of length one with a zero measurement in 2020 for plotting purposes"""
@@ -448,7 +526,16 @@ def ts_extend_helper(df):
 
 
 def glacier_filter_helper(
-    df, first_meas, years_data, prim_classific, form, frontal_chars
+    df,
+    first_meas,
+    years_data,
+    prim_classific,
+    form,
+    frontal_chars,
+    checkbox_mb,
+    checkbox_length,
+    checkbox_tc,
+    checkbox_area,
 ):
     """Apply glacier selection filters to dataframe"""
 
@@ -461,6 +548,11 @@ def glacier_filter_helper(
     if not frontal_chars:
         frontal_chars = dropdown_all
 
+    checkbox_mb = [True] if checkbox_mb == [1] else [True, False]
+    checkbox_length = [True] if checkbox_length == [1] else [True, False]
+    checkbox_tc = [True] if checkbox_tc == [1] else [True, False]
+    checkbox_area = [True] if checkbox_area == [1] else [True, False]
+
     # Apply Filters
     dff = (
         df.query("FIRST_MEAS <= @first_meas")
@@ -468,6 +560,10 @@ def glacier_filter_helper(
         .query("PRIM_CLASSIFIC in @prim_classific")
         .query("FORM in @form")
         .query("FRONTAL_CHARS in @frontal_chars")
+        .query("THICKNESS_CHANGE_TS in @checkbox_tc")
+        .query("LENGTH_TS in @checkbox_length")
+        .query("AREA_TS in @checkbox_area")
+        .query("MASS_BALANCE_TS in @checkbox_mb")
     )
 
     return dff
@@ -501,13 +597,36 @@ def num_data_points_helper(unique_ids):
         Input(component_id="prim_classific_dropdown", component_property="value"),
         Input(component_id="form_dropdown", component_property="value"),
         Input(component_id="frontal_chars_dropdown", component_property="value"),
+        Input(component_id="checkbox_mb", component_property="value"),
+        Input(component_id="checkbox_length", component_property="value"),
+        Input(component_id="checkbox_tc", component_property="value"),
+        Input(component_id="checkbox_area", component_property="value"),
     ],
 )
-def update_satellite_map(first_meas, years_data, prim_classific, form, frontal_chars):
+def update_satellite_map(
+    first_meas,
+    years_data,
+    prim_classific,
+    form,
+    frontal_chars,
+    checkbox_mb,
+    checkbox_length,
+    checkbox_tc,
+    checkbox_area,
+):
     """Update main satellite map and four info boxes above it based on selected filters """
 
     df = glacier_filter_helper(
-        df_combined, first_meas, years_data, prim_classific, form, frontal_chars
+        df_combined,
+        first_meas,
+        years_data,
+        prim_classific,
+        form,
+        frontal_chars,
+        checkbox_mb,
+        checkbox_length,
+        checkbox_tc,
+        checkbox_area,
     )
 
     num_glaciers = f"{len(df.index):,}"
@@ -536,9 +655,9 @@ def update_satellite_map(first_meas, years_data, prim_classific, form, frontal_c
         mapbox_center_lon=0,
         mapbox_zoom=0,
         mapbox=dict(style="stamen-terrain", zoom=0, center=dict(lat=0, lon=0)),
-        autosize=True,
-        height=300,
-        margin=dict(l=0, r=0, b=0, t=0, pad=50),
+        # autosize=True,
+        height=425,
+        margin=dict(l=0, r=0, b=0, t=0, pad=0),
         legend=dict(font=dict(size=10), orientation="h"),
     )
     satellite_map = dict(data=map_data, layout=layout)
