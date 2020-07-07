@@ -25,6 +25,17 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,],)
 
 server = app.server
 
+# Checkbox styling
+cb_inputStyle = {"vertical-align": "middle", "margin": "auto"}
+cb_labelStyle = {"vertical-align": "middle"}
+cb_style = {
+    "display": "inline-flex",
+    "flex-wrap": "wrap",
+    "justify-content": "space-between",
+    "line-height": "28px",
+}
+
+
 # Layout
 app.layout = dbc.Container(
     [
@@ -340,7 +351,10 @@ app.layout = dbc.Container(
                                                                             "value": 1,
                                                                         },
                                                                     ],
-                                                                )
+                                                                    inputStyle=cb_inputStyle,
+                                                                    labelStyle=cb_labelStyle,
+                                                                    style=cb_style,
+                                                                ),
                                                             ),
                                                             html.Td(
                                                                 dcc.Checklist(
@@ -351,6 +365,9 @@ app.layout = dbc.Container(
                                                                             "value": 1,
                                                                         },
                                                                     ],
+                                                                    inputStyle=cb_inputStyle,
+                                                                    labelStyle=cb_labelStyle,
+                                                                    style=cb_style,
                                                                 )
                                                             ),
                                                         ],
@@ -366,6 +383,9 @@ app.layout = dbc.Container(
                                                                             "value": 1,
                                                                         },
                                                                     ],
+                                                                    inputStyle=cb_inputStyle,
+                                                                    labelStyle=cb_labelStyle,
+                                                                    style=cb_style,
                                                                 )
                                                             ),
                                                             html.Td(
@@ -377,6 +397,9 @@ app.layout = dbc.Container(
                                                                             "value": 1,
                                                                         },
                                                                     ],
+                                                                    inputStyle=cb_inputStyle,
+                                                                    labelStyle=cb_labelStyle,
+                                                                    style=cb_style,
                                                                 )
                                                             ),
                                                         ],
