@@ -522,8 +522,8 @@ app.layout = dbc.Container(
                                 [
                                     "¹ Absolute thickness of glaciers is often unknown, "
                                     + "but changes in thickness can be measured by differencing elevation measurments. "
-                                    + "Each line in this plot is a measurements of thickness change between two points in time. "
-                                    + "The y-value indicates the amount of thickness change, while the x-values of the endpoints indicate when measurements where taken."
+                                    + "Each line in this plot is the thickness change between two points in time. "
+                                    + "The y-value indicates the amount of thickness change, while the x-values of the endpoints indicate measurement times."
                                 ],
                                 className="bottom_info_container text-left offset-md-4",
                             ),
