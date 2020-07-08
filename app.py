@@ -77,7 +77,7 @@ app.layout = dbc.Container(
                                     ),
                                     ".",
                                 ],
-                                className="bottom_info_container text-center offset-md-8",
+                                className="top_info_container text-center offset-md-8",
                             ),
                         ],
                     ),
@@ -483,7 +483,7 @@ app.layout = dbc.Container(
                         html.Div(
                             [
                                 html.H5(
-                                    "Thickness Change [mm]", className="text-center",
+                                    "Thickness Change¹ [mm]", className="text-center",
                                 ),
                                 dcc.Graph(id="thickness_change"),
                             ],
@@ -496,9 +496,7 @@ app.layout = dbc.Container(
                     [
                         html.Div(
                             [
-                                html.H5(
-                                    "Glacier Length [km]", className="text-center",
-                                ),
+                                html.H5("Length [km]", className="text-center",),
                                 dcc.Graph(id="length_ts"),
                             ],
                             className="mini_container ",
@@ -512,6 +510,26 @@ app.layout = dbc.Container(
                         ),
                     ],
                     md=4,
+                ),
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    "¹ Absolute thickness of glaciers is often unknown, "
+                                    + "but changes in thickness can be measured by differencing elevation measurments. "
+                                    + "Each line in this plot is a measurements of thickness change between two points in time. "
+                                    + "The y-value indicates the amount of thickness change, while the x-values of the endpoints indicate when measurements where taken."
+                                ],
+                                className="bottom_info_container text-left offset-md-4",
+                            ),
+                        ],
+                    ),
+                    md=12,
                 ),
             ]
         ),
@@ -834,12 +852,13 @@ def update_glacier_figures(satellite_clickdata):
         length_fig = dict(
             data=[
                 dict(
-                    type="bar",
+                    type="scatter",
                     orientation="h",
-                    y=df_l.YEAR,
-                    x=df_l.LENGTH,
+                    x=df_l.YEAR,
+                    y=df_l.LENGTH,
                     width=1,
                     marker=dict(size=12, opacity=0.3,),
+                    line=dict(dash="dot"),
                 )
             ],
             layout=dict(
@@ -847,7 +866,7 @@ def update_glacier_figures(satellite_clickdata):
                 autosize=True,
                 height=200,
                 margin=dict(l=50, r=20, b=20, t=20, pad=1),
-                yaxis=dict(tickformat=".0f"),
+                yaxis=dict(tickformat=".0f", rangemode="tozero"),
             ),
         )
 
