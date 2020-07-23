@@ -45,11 +45,24 @@ modal = html.Div(
     [
         dbc.Modal(
             [
-                dbc.ModalHeader("Header"),
-                dbc.ModalBody("This is the content of the modal"),
-                dbc.ModalFooter(dbc.Button("Close", id="close", className="ml-auto")),
+                dbc.ModalHeader(
+                    "Explore data on glaciers across the world.",
+                    className="bg-lightblue",
+                ),
+                dbc.ModalBody(
+                    [
+                        html.P(
+                            "Discover some of the important data collected by glaciologists, learn about the range in data availability, and determine how your local glaciers are changing. This data is made available via the World Glacier Monitoring Service, and collected through an international collaborative effort."
+                        ),
+                        html.P("This dashboard best viewed from large screen device."),
+                    ]
+                ),
+                dbc.ModalFooter(
+                    dbc.Button("Close", id="close", className="ml-auto bg-darkblue")
+                ),
             ],
             id="modal",
+            centered=True,
         ),
     ]
 )
@@ -61,9 +74,9 @@ modal = html.Div(
     [State("modal", "is_open")],
 )
 def toggle_modal(n2, is_open):
-    if n2:
-        return not is_open
-    return is_open
+    if not n2:
+        return True
+    return False
 
 
 # Layout

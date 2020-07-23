@@ -99,3 +99,10 @@ html {
     border-style : hidden!important; */
 }
 
+.bg-lightblue {
+    background-color: #e6f7ff;
+  }
+  
+  .bg-darkblue {
+    background-color: #1b3e5c;
+  }
