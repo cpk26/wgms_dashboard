@@ -36,49 +36,114 @@ cb_style = {
 }
 
 
+import dash_bootstrap_components as dbc
+import dash_html_components as html
+from dash.dependencies import Input, Output, State
+
+
+modal = html.Div(
+    [
+        dbc.Modal(
+            [
+                dbc.ModalHeader(
+                    "Explore data on glaciers across the world.",
+                    className="bg-lightblue",
+                ),
+                dbc.ModalBody(
+                    [
+                        html.P(
+                            "Discover some of the important data collected by glaciologists, learn about the range in data availability, and determine how your local glaciers are changing. This data is made available via the World Glacier Monitoring Service, and collected through an international collaborative effort."
+                        ),
+                        html.P("This dashboard best viewed from large screen device."),
+                    ]
+                ),
+                dbc.ModalFooter(
+                    dbc.Button("Close", id="close", className="ml-auto bg-darkblue")
+                ),
+            ],
+            id="modal",
+            centered=True,
+        ),
+    ]
+)
+
+
+@app.callback(
+    Output("modal", "is_open"),
+    [Input("close", "n_clicks")],
+    [State("modal", "is_open")],
+)
+def toggle_modal(n2, is_open):
+    if not n2:
+        return True
+    return False
+
+
 # Layout
 app.layout = dbc.Container(
     [
+        modal,
         dbc.Row(
             [
                 dbc.Col(
                     [
                         html.Div(
-                            "World Glacier Monitoring Service",
-                            className="header text-center",
-                        ),
-                        html.Div(
-                            "Fluctuations of Glaciers Data Explorer",
-                            className="sub-header text-center",
+                            "World Glacier Database Explorer",
+                            className="header-left text-left",
                         ),
                     ],
-                    md=12,
-                )
-            ]
+                    md=4,
+                ),
+                dbc.Col(
+                    [
+                        html.Div(
+                            [
+                                "Dashboard by ",
+                                html.A(
+                                    "Inlet Labs",
+                                    href="https://inletlabs.com/",
+                                    className="info_link",
+                                ),
+                                ". Based on WGMS ",
+                                html.A(
+                                    "2019 Data",
+                                    href="https://wgms.ch/data_databaseversions/",
+                                    className="info_link",
+                                ),
+                                ".",
+                            ],
+                            className="header-right text-center",
+                        ),
+                    ],
+                    className="offset-md-4",
+                    md=4,
+                ),
+            ],
+            className="border-bottom",
         ),
         dbc.Row(
             [
                 dbc.Col(
                     html.Div(
                         [
-                            html.Div(
-                                [
-                                    "Dashboard by ",
-                                    html.A(
-                                        "Inlet Labs",
-                                        href="https://inletlabs.com/",
-                                        className="info_link",
-                                    ),
-                                    ". Based on WGMS ",
-                                    html.A(
-                                        "2019 Data",
-                                        href="https://wgms.ch/data_databaseversions/",
-                                        className="info_link",
-                                    ),
-                                    ".",
-                                ],
-                                className="top_info_container text-center offset-md-8",
-                            ),
+                            # html.Div(
+                            #     [
+                            #         "Dashboard by ",
+                            #         html.A(
+                            #             "Inlet Labs",
+                            #             href="https://inletlabs.com/",
+                            #             className="info_link",
+                            #         ),
+                            #         ". Based on WGMS ",
+                            #         html.A(
+                            #             "2019 Data",
+                            #             href="https://wgms.ch/data_databaseversions/",
+                            #             className="info_link",
+                            #         ),
+                            #         ".",
+                            #     ],
+                            #     className="top_info_container text-center offset-md-8",
+                            # ),
                         ],
                     ),
                     md=12,
@@ -222,7 +287,7 @@ app.layout = dbc.Container(
                                                         "value": 1,
                                                     },
                                                     {"label": "Ice Field", "value": 2,},
-                                                    {"label": "Ice Cap", "value": 3},
+                                                    {"label": "Ice Cap", "value": 3,},
                                                     {
                                                         "label": "Outlet Glacier",
                                                         "value": 4,
@@ -279,8 +344,8 @@ app.layout = dbc.Container(
                                                     {"label": "Crater", "value": 6},
                                                     {"label": "Ice Apron", "value": 7,},
                                                     {"label": "Group", "value": 8},
-                                                    {"label": "Remnant", "value": 9},
-                                                    {"label": "Unknown", "value": 10},
+                                                    {"label": "Remnant", "value": 9,},
+                                                    {"label": "Unknown", "value": 10,},
                                                 ],
                                                 multi=True,
                                                 value=[],
@@ -306,7 +371,7 @@ app.layout = dbc.Container(
                                                         "value": 2,
                                                     },
                                                     {"label": "Lobed", "value": 3},
-                                                    {"label": "Calving", "value": 4},
+                                                    {"label": "Calving", "value": 4,},
                                                     {
                                                         "label": "Coalescing, non-contributing",
                                                         "value": 5,
@@ -327,7 +392,7 @@ app.layout = dbc.Container(
                                                         "label": "Single lobe, debris-covered",
                                                         "value": 9,
                                                     },
-                                                    {"label": "Unknown", "value": 10},
+                                                    {"label": "Unknown", "value": 10,},
                                                 ],
                                                 multi=True,
                                                 value=[],
