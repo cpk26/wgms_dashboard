@@ -8,7 +8,7 @@ html {
 
 
   .main_container {
-    padding-top: 3%;
+    padding-top: 1%;
     padding-bottom: 5%;
     padding-left: 8%;
     padding-right: 8%;
@@ -16,7 +16,6 @@ html {
 
   @media (min-width: 2000px) { 
       .main_container {
-        padding-top: 3%;
         padding-bottom: 5%;
         padding-left: 15%;
         padding-right: 15%;
@@ -24,7 +23,6 @@ html {
 
 @media (min-width: 3800px) { 
     .main_container {
-      padding-top: 3%;
       padding-bottom: 5%;
       width: 3800px;
 } }
@@ -73,13 +71,19 @@ html {
     text-decoration: none; 
 }
 
-.header {
-    font-size: 2.5em;
+.header-left {
+    font-size: 1.5em;
+    float: left;
 }
 
-.sub-header {
-    font-size: 1.5em;
+.header-right {
+    font-size: 1em;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    padding: 0px 30px 0px 15px;
 }
+
 
 .ts_table {
     width: 100%;
