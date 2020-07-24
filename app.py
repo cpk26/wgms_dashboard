@@ -69,6 +69,7 @@ filter_fields = html.Div(
     [
         html.Div(
             [
+                # html.H5("Apply Filters", className="text-center",),
                 html.P("Filter by Earliest Measurement:"),
                 dcc.Slider(
                     id="first_measurement_slider",
@@ -268,7 +269,7 @@ sidebar_header = dbc.Row(
             # toggle, resulting in the toggle being right aligned
             width="auto",
             # vertically align the toggle in the center
-            align="center",
+            align="top",
         ),
     ]
 )
@@ -429,18 +430,8 @@ app.layout = dbc.Container(
                 ),
                 dbc.Col(
                     html.Div(
-                        # [filter_fields], className="mini_container selection_panel",
-                    ),
-                    md=4,
-                ),
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    html.Div(
                         [
-                            html.H5("Detailed Information", className="text-center",),
+                            html.H6("Detailed Information", className="text-center",),
                             html.Table(
                                 html.Tbody(
                                     [
@@ -480,47 +471,49 @@ app.layout = dbc.Container(
                     ),
                     md=4,
                 ),
+            ]
+        ),
+        dbc.Row(
+            [
                 dbc.Col(
-                    [
-                        html.Div(
-                            [
-                                html.H5(
-                                    "Mass Balance [mm w.e]", className="text-center",
-                                ),
-                                dcc.Graph(id="mass_balance"),
-                            ],
-                            className="mini_container ",
-                        ),
-                        html.Div(
-                            [
-                                html.H5(
-                                    "Thickness Change¹ [mm]", className="text-center",
-                                ),
-                                dcc.Graph(id="thickness_change"),
-                            ],
-                            className="mini_container ",
-                        ),
-                    ],
-                    md=4,
+                    html.Div(
+                        [
+                            html.H5("Mass Balance [mm w.e]", className="text-center",),
+                            dcc.Graph(id="mass_balance"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    md=3,
                 ),
                 dbc.Col(
-                    [
-                        html.Div(
-                            [
-                                html.H5("Length [km]", className="text-center",),
-                                dcc.Graph(id="length_ts"),
-                            ],
-                            className="mini_container ",
-                        ),
-                        html.Div(
-                            [
-                                html.H5(["Area [1000 m²]"], className="text-center",),
-                                dcc.Graph(id="area_ts"),
-                            ],
-                            className="mini_container ",
-                        ),
-                    ],
-                    md=4,
+                    html.Div(
+                        [
+                            html.H5("Thickness Change¹ [mm]", className="text-center",),
+                            dcc.Graph(id="thickness_change"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    md=3,
+                ),
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.H5("Length [km]", className="text-center",),
+                            dcc.Graph(id="length_ts"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    md=3,
+                ),
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.H5(["Area [1000 m²]"], className="text-center",),
+                            dcc.Graph(id="area_ts"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    md=3,
                 ),
             ]
         ),
