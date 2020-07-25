@@ -43,13 +43,12 @@ modal = html.Div(
         dbc.Modal(
             [
                 dbc.ModalHeader(
-                    "Explore data on glaciers across the world.",
-                    className="bg-lightblue",
+                    "Explore Glaciers around the World.", className="bg-lightblue",
                 ),
                 dbc.ModalBody(
                     [
                         html.P(
-                            "Glaciers are an important natural resource, and are forecast to recede significantly in the 21st century. Use this interface to explore some of the important data collected by glaciologists, and managed by the World Glacier Monitoring Service, to better understand their past and future."
+                            "Glaciers are an important natural resource, and are forecast to recede significantly in the 21st century. Use this interface to explore some of the important data collected by glaciologists to better understand their past and future."
                         ),
                         html.P("This dashboard best viewed from large screen device."),
                     ]
@@ -60,6 +59,7 @@ modal = html.Div(
             ],
             id="modal",
             centered=True,
+            contentClassName="modal",
         ),
     ]
 )
@@ -241,35 +241,39 @@ sidebar_header = dbc.Row(
     [
         dbc.Col(filter_fields,),
         dbc.Col(
-            [
-                html.Button(
-                    # use the Bootstrap navbar-toggler classes to style
-                    html.Span(className="navbar-toggler-icon"),
-                    className="navbar-toggler",
-                    # the navbar-toggler classes don't set color
-                    style={
-                        "color": "rgba(0,0,0,.5)",
-                        "border-color": "rgba(0,0,0,.1)",
-                    },
-                    id="navbar-toggle",
-                ),
-                html.Button(
-                    # use the Bootstrap navbar-toggler classes to style
-                    html.Span(className="navbar-toggler-icon"),
-                    className="navbar-toggler",
-                    # the navbar-toggler classes don't set color
-                    style={
-                        "color": "rgba(0,0,0,.5)",
-                        "border-color": "rgba(0,0,0,.1)",
-                    },
-                    id="sidebar-toggle",
-                ),
-            ],
+            html.Div(
+                [
+                    html.Button(
+                        # use the Bootstrap navbar-toggler classes to style
+                        html.Span(className="navbar-toggler-icon"),
+                        className="navbar-toggler",
+                        # the navbar-toggler classes don't set color
+                        style={
+                            "color": "rgba(0,0,0,.5)",
+                            "border-color": "rgba(0,0,0,.1)",
+                        },
+                        id="navbar-toggle",
+                    ),
+                    html.Button(
+                        # use the Bootstrap navbar-toggler classes to style
+                        html.Span(className="navbar-toggler-icon"),
+                        className="navbar-toggler",
+                        # the navbar-toggler classes don't set color
+                        style={
+                            "color": "rgba(0,0,0,.5)",
+                            "border-color": "rgba(0,0,0,.1)",
+                        },
+                        id="sidebar-toggle",
+                    ),
+                ],
+                className="sidebar_hamburger",
+            ),
             # the column containing the toggle will be only as wide as the
             # toggle, resulting in the toggle being right aligned
             width="auto",
             # vertically align the toggle in the center
             align="top",
+            className="bg-alert",
         ),
     ]
 )
@@ -283,27 +287,28 @@ sidebar = html.Div(
         dbc.Collapse(dbc.Nav([], vertical=True, pills=True,), id="collapse",),
     ],
     id="sidebar",
+    className="collapse",
 )
 
 
 @app.callback(
     Output("sidebar", "className"),
-    [Input("sidebar-toggle", "n_clicks")],
+    [Input("sidebar-toggle", "n_clicks"), Input("apply_filters", "n_clicks")],
     [State("sidebar", "className")],
 )
-def toggle_classname(n, classname):
-    if n and classname == "":
-        return "collapsed"
-    return ""
+def toggle_classname(n, n2, classname):
+    if (n or n2) and classname == "collapsed":
+        return ""
+    return "collapsed"
 
 
 @app.callback(
     Output("collapse", "is_open"),
-    [Input("navbar-toggle", "n_clicks")],
+    [Input("navbar-toggle", "n_clicks"), Input("apply_filters", "n_clicks")],
     [State("collapse", "is_open")],
 )
-def toggle_collapse(n, is_open):
-    if n:
+def toggle_collapse(n, n2, is_open):
+    if n or n2:
         return not is_open
     return is_open
 
@@ -328,19 +333,19 @@ app.layout = dbc.Container(
                     [
                         html.Div(
                             [
-                                "Dashboard by ",
-                                html.A(
-                                    "Inlet Labs",
-                                    href="https://inletlabs.com/",
-                                    className="info_link",
-                                ),
-                                ". Based on WGMS ",
+                                "Based on WGMS ",
                                 html.A(
                                     "2019 Data",
                                     href="https://wgms.ch/data_databaseversions/",
                                     className="info_link",
                                 ),
                                 ".",
+                                " Made by ",
+                                html.A(
+                                    "Inlet Labs",
+                                    href="https://inletlabs.com/",
+                                    className="info_link",
+                                ),
                             ],
                             className="header-right text-center",
                         ),
@@ -364,8 +369,11 @@ app.layout = dbc.Container(
                                             [
                                                 html.Div(
                                                     [
-                                                        html.H3(id="num_glaciers"),
-                                                        "Glaciers",
+                                                        html.Span(
+                                                            id="num_glaciers",
+                                                            className="font-weight-bold",
+                                                        ),
+                                                        html.Span(" Glaciers",),
                                                     ],
                                                     className="mini_container",
                                                 ),
@@ -375,8 +383,11 @@ app.layout = dbc.Container(
                                         dbc.Col(
                                             html.Div(
                                                 [
-                                                    html.H3(id="num_data_points"),
-                                                    "Data Points",
+                                                    html.Span(
+                                                        id="num_data_points",
+                                                        className="font-weight-bold",
+                                                    ),
+                                                    " Data Points",
                                                 ],
                                                 className="mini_container",
                                             ),
@@ -385,8 +396,11 @@ app.layout = dbc.Container(
                                         dbc.Col(
                                             html.Div(
                                                 [
-                                                    html.H3(id="earliest_record"),
-                                                    "Oldest Record",
+                                                    html.Span(
+                                                        id="earliest_record",
+                                                        className="font-weight-bold",
+                                                    ),
+                                                    " Oldest Record",
                                                 ],
                                                 className="mini_container",
                                             ),
@@ -395,10 +409,13 @@ app.layout = dbc.Container(
                                         dbc.Col(
                                             html.Div(
                                                 [
-                                                    html.H3(id="num_countries"),
-                                                    "Countries",
+                                                    html.Span(
+                                                        id="num_countries",
+                                                        className="font-weight-bold",
+                                                    ),
+                                                    " Countries",
                                                 ],
-                                                className="mini_container",
+                                                className="mini_container ",
                                             ),
                                             width=3,
                                         ),
@@ -408,9 +425,27 @@ app.layout = dbc.Container(
                                     dbc.Col(
                                         html.Div(
                                             [
-                                                html.H5(
-                                                    "Satellite Overview",
-                                                    className="text-center",
+                                                html.Div(
+                                                    [
+                                                        html.Div(
+                                                            html.P(
+                                                                [
+                                                                    "Select a glacier on the map to see available data",
+                                                                ],
+                                                                className="font-italic ",
+                                                            ),
+                                                            className="align-text-bottom satellite-instructions",
+                                                        ),
+                                                        html.Div(
+                                                            html.Button(
+                                                                "Apply Filters",
+                                                                className="button",
+                                                                id="apply_filters",
+                                                            ),
+                                                            className="ml-auto",
+                                                        ),
+                                                    ],
+                                                    className="d-flex satellite-header",
                                                 ),
                                                 dcc.Graph(id="mapbox"),
                                             ],
@@ -431,7 +466,10 @@ app.layout = dbc.Container(
                 dbc.Col(
                     html.Div(
                         [
-                            html.H6("Detailed Information", className="text-center",),
+                            html.Div(
+                                "Glacier Details",
+                                className="container_header text-center",
+                            ),
                             html.Table(
                                 html.Tbody(
                                     [
@@ -478,44 +516,56 @@ app.layout = dbc.Container(
                 dbc.Col(
                     html.Div(
                         [
-                            html.H5("Mass Balance [mm w.e]", className="text-center",),
+                            html.Div(
+                                "Mass Balance [mm w.e]",
+                                className="container_header text-center",
+                            ),
                             dcc.Graph(id="mass_balance"),
                         ],
                         className="mini_container ",
                     ),
-                    md=3,
+                    width=3,
                 ),
                 dbc.Col(
                     html.Div(
                         [
-                            html.H5("Thickness Change¹ [mm]", className="text-center",),
+                            html.Div(
+                                "Thickness Change¹ [mm]",
+                                className="container_header text-center",
+                            ),
                             dcc.Graph(id="thickness_change"),
                         ],
                         className="mini_container ",
                     ),
-                    md=3,
+                    width=3,
                 ),
                 dbc.Col(
                     html.Div(
                         [
-                            html.H5("Length [km]", className="text-center",),
+                            html.Div(
+                                "Length [km]", className="container_header text-center",
+                            ),
                             dcc.Graph(id="length_ts"),
                         ],
                         className="mini_container ",
                     ),
-                    md=3,
+                    width=3,
                 ),
                 dbc.Col(
                     html.Div(
                         [
-                            html.H5(["Area [1000 m²]"], className="text-center",),
+                            html.Div(
+                                ["Area [1000 m²]"],
+                                className="container_header text-center",
+                            ),
                             dcc.Graph(id="area_ts"),
                         ],
                         className="mini_container ",
                     ),
-                    md=3,
+                    width=3,
                 ),
-            ]
+            ],
+            className="last_row ",
         ),
         dbc.Row(
             [
@@ -748,9 +798,9 @@ def update_glacier_info_div(input_value):
     text_keys = dict(
         NAME="Name:",
         WGMS_ID="WGMS Id:",
-        SPEC_LOCATION="Geographic Location:",
+        SPEC_LOCATION="Location:",
         POLITICAL_UNIT="Country/Territory:",
-        ELEVATION="Elevation Range (m):",
+        ELEVATION="Elevations (m):",
         LAT_LONG="Lat - Long:",
         REFERENCE="Reference:",
         SPONS_AGENCY="Sponsoring Agency:",

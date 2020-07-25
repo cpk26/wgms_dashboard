@@ -31,9 +31,19 @@ html {
     border-radius: 5px;
     background-color:  #f6f6f6;
     margin: 10px 0px 10px 0px;
-    padding: 15px;
+    padding: 10px;
     position: relative;
     box-shadow: 2px 2px 2px lightgrey;
+}
+
+.container_header {
+    font-weight: 300; 
+    font-size: 2.0rem; 
+    line-height: 1.6;  
+    letter-spacing: 0; 
+    margin-bottom: 0.70rem; 
+    margin-top: 0.35rem;
+
 }
 
 .selection_panel {
@@ -45,8 +55,16 @@ html {
     padding: 10px;
 }
 .satellite_container {
-    padding-left: 8%;
-    padding-right: 8%;    
+    padding-left: 0%;
+    padding-right: 0%;    
+}
+
+.satellite-header {
+    margin-bottom: 10px;
+}
+
+.satellite-instructions {
+    padding-top: 10px;
 }
 
 .glacier_info_panel {
@@ -93,11 +111,6 @@ html {
     width: 50%;
 }
 
-.checkbox_table {
-    /* border: none !important;
-    border-collapse:collapse !important;
-    border-style : hidden!important; */
-}
 
 .bg-lightblue {
     background-color: #e6f7ff;
@@ -107,15 +120,43 @@ html {
     background-color: #1b3e5c;
   }
 
+  .alignleft {
+	float: left;
+}
+.alignright {
+	float: right;
+}
 
+.button:hover{
+    background-color: #1b3e5c; 
+    color: white;
+}
+
+.last_row {
+    padding-left: 15px;
+}
+
+
+.modal {
+    border-radius: 10px;
+}
+
+.sidebar_hamburger {
+    border-radius: 3px;
+}
+
+.sidebar_hamburger:hover {
+    border-radius: 3px;
+    background-color: #1b3e5c; 
+}
 
   #sidebar {
     text-align: left;
     padding: 15px;
-    background-color: #f6f6f6;
+    background-color: hsl(0, 0%, 96%);
     z-index: 10;
   }
-  
+
   #sidebar h2 {
     text-align: left;
     margin-bottom: 0;
@@ -136,8 +177,10 @@ html {
   
   /* add the three horizontal bars icon for the toggle */
   .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-  }
+    /* background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); */
+    background-image: url(menu-icon.svg);
+  
+}
   
   #page-content {
     padding: 2rem 1rem;
