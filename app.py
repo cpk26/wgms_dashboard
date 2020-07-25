@@ -6,7 +6,8 @@ import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
+
 
 # Data Import
 df_combined = pd.read_pickle("wgms_combined")
@@ -35,24 +36,19 @@ cb_style = {
     "line-height": "28px",
 }
 
-
-import dash_bootstrap_components as dbc
-import dash_html_components as html
-from dash.dependencies import Input, Output, State
-
+## Modal
 
 modal = html.Div(
     [
         dbc.Modal(
             [
                 dbc.ModalHeader(
-                    "Explore data on glaciers across the world.",
-                    className="bg-lightblue",
+                    "Explore Glaciers around the World.", className="bg-lightblue",
                 ),
                 dbc.ModalBody(
                     [
                         html.P(
-                            "Discover some of the important data collected by glaciologists, learn about the range in data availability, and determine how your local glaciers are changing. This data is made available via the World Glacier Monitoring Service, and collected through an international collaborative effort."
+                            "Glaciers are an important natural resource, and are forecast to recede significantly in the 21st century. Use this interface to explore some of the important data collected by glaciologists to better understand their past and future."
                         ),
                         html.P("This dashboard best viewed from large screen device."),
                     ]
@@ -63,26 +59,265 @@ modal = html.Div(
             ],
             id="modal",
             centered=True,
+            contentClassName="modal",
         ),
     ]
 )
 
+## Filter
+filter_fields = html.Div(
+    [
+        html.Div(
+            [
+                # html.H5("Apply Filters", className="text-center",),
+                html.P("Filter by Earliest Measurement:"),
+                dcc.Slider(
+                    id="first_measurement_slider",
+                    min=1850,
+                    max=2020,
+                    step=1,
+                    value=2020,
+                    marks={1850: "1850", 1900: "1900", 1950: "1950", 2000: "2000",},
+                ),
+            ],
+            className="selection_item",
+        ),
+        html.Div(
+            [
+                html.P("Filter by Years of Data:"),
+                dcc.Slider(
+                    id="years_data_slider",
+                    min=0,
+                    max=20,
+                    step=1,
+                    value=0,
+                    marks={0: "0+", 4: "4+", 8: "8+", 12: "12+", 16: "16+", 20: "20+",},
+                ),
+            ],
+            className="selection_item",
+        ),
+        html.Div(
+            [
+                html.P("Filter by Primary Classification:"),
+                dcc.Dropdown(
+                    id="prim_classific_dropdown",
+                    options=[
+                        {"label": "Miscellaneous", "value": 0,},
+                        {"label": "Continental ice sheet", "value": 1,},
+                        {"label": "Ice Field", "value": 2,},
+                        {"label": "Ice Cap", "value": 3,},
+                        {"label": "Outlet Glacier", "value": 4,},
+                        {"label": "Valley Glacier", "value": 5,},
+                        {"label": "Mountain glacier ", "value": 6,},
+                        {"label": "Glacieret and snowfield", "value": 7,},
+                        {"label": "Ice Shelf", "value": 8,},
+                        {"label": "Rock Glacier", "value": 9,},
+                        {"label": "Unknown", "value": 10,},
+                    ],
+                    multi=True,
+                    value=None,
+                ),
+            ],
+            className="selection_item",
+        ),
+        html.Div(
+            [
+                html.P("Filter by Form:"),
+                dcc.Dropdown(
+                    id="form_dropdown",
+                    options=[
+                        {"label": "Miscellaneous", "value": 0,},
+                        {"label": "Compound Basins", "value": 1,},
+                        {"label": "Compound Basin", "value": 2,},
+                        {"label": "Simple Basin", "value": 3,},
+                        {"label": "Cirque", "value": 4},
+                        {"label": "Niche", "value": 5},
+                        {"label": "Crater", "value": 6},
+                        {"label": "Ice Apron", "value": 7,},
+                        {"label": "Group", "value": 8},
+                        {"label": "Remnant", "value": 9,},
+                        {"label": "Unknown", "value": 10,},
+                    ],
+                    multi=True,
+                    value=[],
+                ),
+            ],
+            className="selection_item",
+        ),
+        html.Div(
+            [
+                html.P("Filter by Frontal Characteristics:"),
+                dcc.Dropdown(
+                    id="frontal_chars_dropdown",
+                    options=[
+                        {"label": "Miscellaneous", "value": 0,},
+                        {"label": "Piedmont", "value": 1,},
+                        {"label": "Expanded Foot", "value": 2,},
+                        {"label": "Lobed", "value": 3},
+                        {"label": "Calving", "value": 4,},
+                        {"label": "Coalescing, non-contributing", "value": 5,},
+                        {"label": "Irregular, clean ice", "value": 6,},
+                        {"label": "Irregular, debris-covered", "value": 7,},
+                        {"label": "Single lobe, clean ice", "value": 8,},
+                        {"label": "Single lobe, debris-covered", "value": 9,},
+                        {"label": "Unknown", "value": 10,},
+                    ],
+                    multi=True,
+                    value=[],
+                ),
+            ],
+            className="selection_item",
+        ),
+        html.Div(
+            [
+                html.P("Filter by Available Data:"),
+                html.Table(
+                    [
+                        html.Tr(
+                            [
+                                html.Td(
+                                    dcc.Checklist(
+                                        id="checkbox_mb",
+                                        options=[
+                                            {"label": " Mass Balance", "value": 1,},
+                                        ],
+                                        inputStyle=cb_inputStyle,
+                                        labelStyle=cb_labelStyle,
+                                        style=cb_style,
+                                    ),
+                                    className="half_width",
+                                ),
+                                html.Td(
+                                    dcc.Checklist(
+                                        id="checkbox_length",
+                                        options=[{"label": " Length", "value": 1,},],
+                                        inputStyle=cb_inputStyle,
+                                        labelStyle=cb_labelStyle,
+                                        style=cb_style,
+                                    ),
+                                    className="half_width",
+                                ),
+                            ],
+                        ),
+                        html.Tr(
+                            [
+                                html.Td(
+                                    dcc.Checklist(
+                                        id="checkbox_tc",
+                                        options=[
+                                            {"label": " Thickness Change", "value": 1,},
+                                        ],
+                                        inputStyle=cb_inputStyle,
+                                        labelStyle=cb_labelStyle,
+                                        style=cb_style,
+                                    ),
+                                    className="half_width",
+                                ),
+                                html.Td(
+                                    dcc.Checklist(
+                                        id="checkbox_area",
+                                        options=[{"label": " Area", "value": 1,},],
+                                        inputStyle=cb_inputStyle,
+                                        labelStyle=cb_labelStyle,
+                                        style=cb_style,
+                                    ),
+                                    className="half_width",
+                                ),
+                            ],
+                            className="checkbox_table",
+                        ),
+                    ],
+                    className="ts_table checkbox_table",
+                ),
+            ],
+            className="selection_item",
+        ),
+    ],
+)
+
+
+## Sidebar
+sidebar_header = dbc.Row(
+    [
+        dbc.Col(filter_fields,),
+        dbc.Col(
+            html.Div(
+                [
+                    html.Button(
+                        # use the Bootstrap navbar-toggler classes to style
+                        html.Span(className="navbar-toggler-icon"),
+                        className="navbar-toggler",
+                        # the navbar-toggler classes don't set color
+                        style={
+                            "color": "rgba(0,0,0,.5)",
+                            "border-color": "rgba(0,0,0,.1)",
+                        },
+                        id="navbar-toggle",
+                    ),
+                    html.Button(
+                        # use the Bootstrap navbar-toggler classes to style
+                        html.Span(className="navbar-toggler-icon"),
+                        className="navbar-toggler",
+                        # the navbar-toggler classes don't set color
+                        style={
+                            "color": "rgba(0,0,0,.5)",
+                            "border-color": "rgba(0,0,0,.1)",
+                        },
+                        id="sidebar-toggle",
+                    ),
+                ],
+                className="sidebar_hamburger",
+            ),
+            # the column containing the toggle will be only as wide as the
+            # toggle, resulting in the toggle being right aligned
+            width="auto",
+            # vertically align the toggle in the center
+            align="top",
+            className="bg-alert",
+        ),
+    ]
+)
+
+sidebar = html.Div(
+    [
+        sidebar_header,
+        # we wrap the horizontal rule and short blurb in a div that can be
+        # hidden on a small screen
+        # use the Collapse component to animate hiding / revealing links
+        dbc.Collapse(dbc.Nav([], vertical=True, pills=True,), id="collapse",),
+    ],
+    id="sidebar",
+    className="collapse",
+)
+
 
 @app.callback(
-    Output("modal", "is_open"),
-    [Input("close", "n_clicks")],
-    [State("modal", "is_open")],
+    Output("sidebar", "className"),
+    [Input("sidebar-toggle", "n_clicks"), Input("apply_filters", "n_clicks")],
+    [State("sidebar", "className")],
 )
-def toggle_modal(n2, is_open):
-    if not n2:
-        return True
-    return False
+def toggle_classname(n, n2, classname):
+    if (n or n2) and classname == "collapsed":
+        return ""
+    return "collapsed"
+
+
+@app.callback(
+    Output("collapse", "is_open"),
+    [Input("navbar-toggle", "n_clicks"), Input("apply_filters", "n_clicks")],
+    [State("collapse", "is_open")],
+)
+def toggle_collapse(n, n2, is_open):
+    if n or n2:
+        return not is_open
+    return is_open
 
 
 # Layout
 app.layout = dbc.Container(
     [
         modal,
+        sidebar,
         dbc.Row(
             [
                 dbc.Col(
@@ -98,19 +333,19 @@ app.layout = dbc.Container(
                     [
                         html.Div(
                             [
-                                "Dashboard by ",
-                                html.A(
-                                    "Inlet Labs",
-                                    href="https://inletlabs.com/",
-                                    className="info_link",
-                                ),
-                                ". Based on WGMS ",
+                                "Based on WGMS ",
                                 html.A(
                                     "2019 Data",
                                     href="https://wgms.ch/data_databaseversions/",
                                     className="info_link",
                                 ),
                                 ".",
+                                " Made by ",
+                                html.A(
+                                    "Inlet Labs",
+                                    href="https://inletlabs.com/",
+                                    className="info_link",
+                                ),
                             ],
                             className="header-right text-center",
                         ),
@@ -120,35 +355,6 @@ app.layout = dbc.Container(
                 ),
             ],
             className="border-bottom",
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    html.Div(
-                        [
-                            # html.Div(
-                            #     [
-                            #         "Dashboard by ",
-                            #         html.A(
-                            #             "Inlet Labs",
-                            #             href="https://inletlabs.com/",
-                            #             className="info_link",
-                            #         ),
-                            #         ". Based on WGMS ",
-                            #         html.A(
-                            #             "2019 Data",
-                            #             href="https://wgms.ch/data_databaseversions/",
-                            #             className="info_link",
-                            #         ),
-                            #         ".",
-                            #     ],
-                            #     className="top_info_container text-center offset-md-8",
-                            # ),
-                        ],
-                    ),
-                    md=12,
-                ),
-            ]
         ),
         dbc.Row(
             [
@@ -163,8 +369,11 @@ app.layout = dbc.Container(
                                             [
                                                 html.Div(
                                                     [
-                                                        html.H3(id="num_glaciers"),
-                                                        "Glaciers",
+                                                        html.Span(
+                                                            id="num_glaciers",
+                                                            className="font-weight-bold",
+                                                        ),
+                                                        html.Span(" Glaciers",),
                                                     ],
                                                     className="mini_container",
                                                 ),
@@ -174,8 +383,11 @@ app.layout = dbc.Container(
                                         dbc.Col(
                                             html.Div(
                                                 [
-                                                    html.H3(id="num_data_points"),
-                                                    "Data Points",
+                                                    html.Span(
+                                                        id="num_data_points",
+                                                        className="font-weight-bold",
+                                                    ),
+                                                    " Data Points",
                                                 ],
                                                 className="mini_container",
                                             ),
@@ -184,8 +396,11 @@ app.layout = dbc.Container(
                                         dbc.Col(
                                             html.Div(
                                                 [
-                                                    html.H3(id="earliest_record"),
-                                                    "Oldest Record",
+                                                    html.Span(
+                                                        id="earliest_record",
+                                                        className="font-weight-bold",
+                                                    ),
+                                                    " Oldest Record",
                                                 ],
                                                 className="mini_container",
                                             ),
@@ -194,10 +409,13 @@ app.layout = dbc.Container(
                                         dbc.Col(
                                             html.Div(
                                                 [
-                                                    html.H3(id="num_countries"),
-                                                    "Countries",
+                                                    html.Span(
+                                                        id="num_countries",
+                                                        className="font-weight-bold",
+                                                    ),
+                                                    " Countries",
                                                 ],
-                                                className="mini_container",
+                                                className="mini_container ",
                                             ),
                                             width=3,
                                         ),
@@ -207,9 +425,27 @@ app.layout = dbc.Container(
                                     dbc.Col(
                                         html.Div(
                                             [
-                                                html.H5(
-                                                    "Satellite Overview",
-                                                    className="text-center",
+                                                html.Div(
+                                                    [
+                                                        html.Div(
+                                                            html.P(
+                                                                [
+                                                                    "Select a glacier on the map to see available data",
+                                                                ],
+                                                                className="font-italic ",
+                                                            ),
+                                                            className="align-text-bottom satellite-instructions",
+                                                        ),
+                                                        html.Div(
+                                                            html.Button(
+                                                                "Apply Filters",
+                                                                className="button",
+                                                                id="apply_filters",
+                                                            ),
+                                                            className="ml-auto",
+                                                        ),
+                                                    ],
+                                                    className="d-flex satellite-header",
                                                 ),
                                                 dcc.Graph(id="mapbox"),
                                             ],
@@ -231,270 +467,9 @@ app.layout = dbc.Container(
                     html.Div(
                         [
                             html.Div(
-                                [
-                                    html.Div(
-                                        [
-                                            html.P("Filter by Earliest Measurement:"),
-                                            dcc.Slider(
-                                                id="first_measurement_slider",
-                                                min=1850,
-                                                max=2020,
-                                                step=1,
-                                                value=2020,
-                                                marks={
-                                                    1850: "1850",
-                                                    1900: "1900",
-                                                    1950: "1950",
-                                                    2000: "2000",
-                                                },
-                                            ),
-                                        ],
-                                        className="selection_item",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.P("Filter by Years of Data:"),
-                                            dcc.Slider(
-                                                id="years_data_slider",
-                                                min=0,
-                                                max=20,
-                                                step=1,
-                                                value=0,
-                                                marks={
-                                                    0: "0+",
-                                                    4: "4+",
-                                                    8: "8+",
-                                                    12: "12+",
-                                                    16: "16+",
-                                                    20: "20+",
-                                                },
-                                            ),
-                                        ],
-                                        className="selection_item",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.P("Filter by Primary Classification:"),
-                                            dcc.Dropdown(
-                                                id="prim_classific_dropdown",
-                                                options=[
-                                                    {
-                                                        "label": "Miscellaneous",
-                                                        "value": 0,
-                                                    },
-                                                    {
-                                                        "label": "Continental ice sheet",
-                                                        "value": 1,
-                                                    },
-                                                    {"label": "Ice Field", "value": 2,},
-                                                    {"label": "Ice Cap", "value": 3,},
-                                                    {
-                                                        "label": "Outlet Glacier",
-                                                        "value": 4,
-                                                    },
-                                                    {
-                                                        "label": "Valley Glacier",
-                                                        "value": 5,
-                                                    },
-                                                    {
-                                                        "label": "Mountain glacier ",
-                                                        "value": 6,
-                                                    },
-                                                    {
-                                                        "label": "Glacieret and snowfield",
-                                                        "value": 7,
-                                                    },
-                                                    {"label": "Ice Shelf", "value": 8,},
-                                                    {
-                                                        "label": "Rock Glacier",
-                                                        "value": 9,
-                                                    },
-                                                    {"label": "Unknown", "value": 10,},
-                                                ],
-                                                multi=True,
-                                                value=None,
-                                            ),
-                                        ],
-                                        className="selection_item",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.P("Filter by Form:"),
-                                            dcc.Dropdown(
-                                                id="form_dropdown",
-                                                options=[
-                                                    {
-                                                        "label": "Miscellaneous",
-                                                        "value": 0,
-                                                    },
-                                                    {
-                                                        "label": "Compound Basins",
-                                                        "value": 1,
-                                                    },
-                                                    {
-                                                        "label": "Compound Basin",
-                                                        "value": 2,
-                                                    },
-                                                    {
-                                                        "label": "Simple Basin",
-                                                        "value": 3,
-                                                    },
-                                                    {"label": "Cirque", "value": 4},
-                                                    {"label": "Niche", "value": 5},
-                                                    {"label": "Crater", "value": 6},
-                                                    {"label": "Ice Apron", "value": 7,},
-                                                    {"label": "Group", "value": 8},
-                                                    {"label": "Remnant", "value": 9,},
-                                                    {"label": "Unknown", "value": 10,},
-                                                ],
-                                                multi=True,
-                                                value=[],
-                                            ),
-                                        ],
-                                        className="selection_item",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.P(
-                                                "Filter by Frontal Characteristics:"
-                                            ),
-                                            dcc.Dropdown(
-                                                id="frontal_chars_dropdown",
-                                                options=[
-                                                    {
-                                                        "label": "Miscellaneous",
-                                                        "value": 0,
-                                                    },
-                                                    {"label": "Piedmont", "value": 1,},
-                                                    {
-                                                        "label": "Expanded Foot",
-                                                        "value": 2,
-                                                    },
-                                                    {"label": "Lobed", "value": 3},
-                                                    {"label": "Calving", "value": 4,},
-                                                    {
-                                                        "label": "Coalescing, non-contributing",
-                                                        "value": 5,
-                                                    },
-                                                    {
-                                                        "label": "Irregular, clean ice",
-                                                        "value": 6,
-                                                    },
-                                                    {
-                                                        "label": "Irregular, debris-covered",
-                                                        "value": 7,
-                                                    },
-                                                    {
-                                                        "label": "Single lobe, clean ice",
-                                                        "value": 8,
-                                                    },
-                                                    {
-                                                        "label": "Single lobe, debris-covered",
-                                                        "value": 9,
-                                                    },
-                                                    {"label": "Unknown", "value": 10,},
-                                                ],
-                                                multi=True,
-                                                value=[],
-                                            ),
-                                        ],
-                                        className="selection_item",
-                                    ),
-                                    html.Div(
-                                        [
-                                            html.P("Filter by Available Data:"),
-                                            html.Table(
-                                                [
-                                                    html.Tr(
-                                                        [
-                                                            html.Td(
-                                                                dcc.Checklist(
-                                                                    id="checkbox_mb",
-                                                                    options=[
-                                                                        {
-                                                                            "label": " Mass Balance",
-                                                                            "value": 1,
-                                                                        },
-                                                                    ],
-                                                                    inputStyle=cb_inputStyle,
-                                                                    labelStyle=cb_labelStyle,
-                                                                    style=cb_style,
-                                                                ),
-                                                                className="half_width",
-                                                            ),
-                                                            html.Td(
-                                                                dcc.Checklist(
-                                                                    id="checkbox_length",
-                                                                    options=[
-                                                                        {
-                                                                            "label": " Length",
-                                                                            "value": 1,
-                                                                        },
-                                                                    ],
-                                                                    inputStyle=cb_inputStyle,
-                                                                    labelStyle=cb_labelStyle,
-                                                                    style=cb_style,
-                                                                ),
-                                                                className="half_width",
-                                                            ),
-                                                        ],
-                                                    ),
-                                                    html.Tr(
-                                                        [
-                                                            html.Td(
-                                                                dcc.Checklist(
-                                                                    id="checkbox_tc",
-                                                                    options=[
-                                                                        {
-                                                                            "label": " Thickness Change",
-                                                                            "value": 1,
-                                                                        },
-                                                                    ],
-                                                                    inputStyle=cb_inputStyle,
-                                                                    labelStyle=cb_labelStyle,
-                                                                    style=cb_style,
-                                                                ),
-                                                                className="half_width",
-                                                            ),
-                                                            html.Td(
-                                                                dcc.Checklist(
-                                                                    id="checkbox_area",
-                                                                    options=[
-                                                                        {
-                                                                            "label": " Area",
-                                                                            "value": 1,
-                                                                        },
-                                                                    ],
-                                                                    inputStyle=cb_inputStyle,
-                                                                    labelStyle=cb_labelStyle,
-                                                                    style=cb_style,
-                                                                ),
-                                                                className="half_width",
-                                                            ),
-                                                        ],
-                                                        className="checkbox_table",
-                                                    ),
-                                                ],
-                                                className="ts_table checkbox_table",
-                                            ),
-                                        ],
-                                        className="selection_item",
-                                    ),
-                                ],
-                            )
-                        ],
-                        className="mini_container selection_panel",
-                    ),
-                    md=4,
-                ),
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col(
-                    html.Div(
-                        [
-                            html.H5("Detailed Information", className="text-center",),
+                                "Glacier Details",
+                                className="container_header text-center",
+                            ),
                             html.Table(
                                 html.Tbody(
                                     [
@@ -534,49 +509,63 @@ app.layout = dbc.Container(
                     ),
                     md=4,
                 ),
-                dbc.Col(
-                    [
-                        html.Div(
-                            [
-                                html.H5(
-                                    "Mass Balance [mm w.e]", className="text-center",
-                                ),
-                                dcc.Graph(id="mass_balance"),
-                            ],
-                            className="mini_container ",
-                        ),
-                        html.Div(
-                            [
-                                html.H5(
-                                    "Thickness Change¹ [mm]", className="text-center",
-                                ),
-                                dcc.Graph(id="thickness_change"),
-                            ],
-                            className="mini_container ",
-                        ),
-                    ],
-                    md=4,
-                ),
-                dbc.Col(
-                    [
-                        html.Div(
-                            [
-                                html.H5("Length [km]", className="text-center",),
-                                dcc.Graph(id="length_ts"),
-                            ],
-                            className="mini_container ",
-                        ),
-                        html.Div(
-                            [
-                                html.H5(["Area [1000 m²]"], className="text-center",),
-                                dcc.Graph(id="area_ts"),
-                            ],
-                            className="mini_container ",
-                        ),
-                    ],
-                    md=4,
-                ),
             ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Div(
+                                "Mass Balance [mm w.e]",
+                                className="container_header text-center",
+                            ),
+                            dcc.Graph(id="mass_balance"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    width=3,
+                ),
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Div(
+                                "Thickness Change¹ [mm]",
+                                className="container_header text-center",
+                            ),
+                            dcc.Graph(id="thickness_change"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    width=3,
+                ),
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Div(
+                                "Length [km]", className="container_header text-center",
+                            ),
+                            dcc.Graph(id="length_ts"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    width=3,
+                ),
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Div(
+                                ["Area [1000 m²]"],
+                                className="container_header text-center",
+                            ),
+                            dcc.Graph(id="area_ts"),
+                        ],
+                        className="mini_container ",
+                    ),
+                    width=3,
+                ),
+            ],
+            className="last_row ",
         ),
         dbc.Row(
             [
@@ -809,9 +798,9 @@ def update_glacier_info_div(input_value):
     text_keys = dict(
         NAME="Name:",
         WGMS_ID="WGMS Id:",
-        SPEC_LOCATION="Geographic Location:",
+        SPEC_LOCATION="Location:",
         POLITICAL_UNIT="Country/Territory:",
-        ELEVATION="Elevation Range (m):",
+        ELEVATION="Elevations (m):",
         LAT_LONG="Lat - Long:",
         REFERENCE="Reference:",
         SPONS_AGENCY="Sponsoring Agency:",
@@ -957,6 +946,17 @@ def update_glacier_figures(satellite_clickdata):
         )
 
     return thickness_fig, massbalance_fig, length_fig, area_fig
+
+
+@app.callback(
+    Output("modal", "is_open"),
+    [Input("close", "n_clicks")],
+    [State("modal", "is_open")],
+)
+def toggle_modal(n2, is_open):
+    if not n2:
+        return True
+    return False
 
 
 if __name__ == "__main__":
