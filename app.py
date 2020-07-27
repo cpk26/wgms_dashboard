@@ -773,7 +773,7 @@ def update_satellite_map(
         mapbox_zoom=0,
         mapbox=dict(style="stamen-terrain", zoom=0, center=dict(lat=0, lon=0)),
         # autosize=True,
-        height=425,
+        height=350,
         margin=dict(l=0, r=0, b=0, t=0, pad=0),
         legend=dict(font=dict(size=10), orientation="h"),
     )
