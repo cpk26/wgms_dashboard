@@ -48,7 +48,7 @@ modal = html.Div(
                 dbc.ModalBody(
                     [
                         html.P(
-                            "Glaciers are an important natural resource, and are forecast to recede significantly in the 21st century. Use this interface to explore some of the important data collected by glaciologists to better understand their past and future."
+                            "Glaciers are an important natural resource, forecast to recede significantly in the 21st century. Use this interface to explore some of the important data collected by glaciologists to better understand their past and future."
                         ),
                         html.P("This dashboard best viewed from large screen device."),
                     ]
