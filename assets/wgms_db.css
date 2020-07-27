@@ -8,7 +8,7 @@ html {
 
 
   .main_container {
-    padding-top: 1%;
+    padding-top: 0.5%;
     padding-bottom: 5%;
     padding-left: 8%;
     padding-right: 8%;
@@ -43,7 +43,15 @@ html {
     letter-spacing: 0; 
     margin-bottom: 0.70rem; 
     margin-top: 0.35rem;
+}
 
+.container_header_details {
+  font-weight: 300; 
+  font-size: 2.0rem; 
+  line-height: 1.6;  
+  letter-spacing: 0; 
+  margin-bottom: 0.0rem; 
+  margin-top: 0.0rem;
 }
 
 .selection_panel {

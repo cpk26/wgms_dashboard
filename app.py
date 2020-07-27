@@ -313,6 +313,20 @@ def toggle_collapse(n, n2, is_open):
     return is_open
 
 
+modebar_config_satellite = {
+    "modeBarButtonsToRemove": ["lasso2d", "select2d", "toggleHover"]
+}
+modebar_config = {
+    "modeBarButtonsToRemove": [
+        "lasso2d",
+        "select2d",
+        "toggleHover",
+        "toggleSpikelines",
+        "hoverCompareCartesian",
+        "hoverClosestCartesian",
+    ]
+}
+
 # Layout
 app.layout = dbc.Container(
     [
@@ -447,7 +461,10 @@ app.layout = dbc.Container(
                                                     ],
                                                     className="d-flex satellite-header",
                                                 ),
-                                                dcc.Graph(id="mapbox"),
+                                                dcc.Graph(
+                                                    id="mapbox",
+                                                    config=modebar_config_satellite,
+                                                ),
                                             ],
                                             className="satellite_container",
                                         ),
@@ -468,7 +485,7 @@ app.layout = dbc.Container(
                         [
                             html.Div(
                                 "Glacier Details",
-                                className="container_header text-center",
+                                className="container_header_details text-center",
                             ),
                             html.Table(
                                 html.Tbody(
@@ -520,7 +537,7 @@ app.layout = dbc.Container(
                                 "Mass Balance [mm w.e]",
                                 className="container_header text-center",
                             ),
-                            dcc.Graph(id="mass_balance"),
+                            dcc.Graph(id="mass_balance", config=modebar_config),
                         ],
                         className="mini_container ",
                     ),
@@ -533,7 +550,7 @@ app.layout = dbc.Container(
                                 "Thickness Change¹ [mm]",
                                 className="container_header text-center",
                             ),
-                            dcc.Graph(id="thickness_change"),
+                            dcc.Graph(id="thickness_change", config=modebar_config),
                         ],
                         className="mini_container ",
                     ),
@@ -545,7 +562,7 @@ app.layout = dbc.Container(
                             html.Div(
                                 "Length [km]", className="container_header text-center",
                             ),
-                            dcc.Graph(id="length_ts"),
+                            dcc.Graph(id="length_ts", config=modebar_config),
                         ],
                         className="mini_container ",
                     ),
@@ -558,7 +575,7 @@ app.layout = dbc.Container(
                                 ["Area [1000 m²]"],
                                 className="container_header text-center",
                             ),
-                            dcc.Graph(id="area_ts"),
+                            dcc.Graph(id="area_ts", config=modebar_config),
                         ],
                         className="mini_container ",
                     ),
@@ -760,6 +777,7 @@ def update_satellite_map(
         margin=dict(l=0, r=0, b=0, t=0, pad=0),
         legend=dict(font=dict(size=10), orientation="h"),
     )
+
     satellite_map = dict(data=map_data, layout=layout)
 
     return (
