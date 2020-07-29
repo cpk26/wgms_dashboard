@@ -1,4 +1,3 @@
-from dash_html_components.Tr import Tr
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
