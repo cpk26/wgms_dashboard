@@ -11,4 +11,4 @@ RUN pip3 install -r /tmp/requirements.txt
 COPY ./ /app
 WORKDIR /app
 
-CMD gunicorn --bind 0.0.0.0:80 wsgi
+CMD gunicorn --bind 0.0.0.0:8080 wsgi
