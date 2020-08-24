@@ -1,7 +1,7 @@
 ## WGMS Data Exploration Dashboard
 This repository contains a dashboard of Fluctuations of Glaciers Database [1] published by the World Glacier Monitoring Services. 
 
-[View Here](https://wgms-ice-dashboard.herokuapp.com/)
+[View Here](https://inletlabs.com/wgms-dash.html)
 
 ## Running
 
